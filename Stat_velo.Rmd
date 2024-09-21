@@ -3,6 +3,9 @@ title: "Stat_velo"
 author: "Marine"
 date: "2024-09-20"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -11,11 +14,66 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Variable réponse : nombre de vélos loués
 
-Variables explicatives : variables météo, variable vacances, 
+Variables explicatives : variables météo, variable vacances,
 
-→ Problématique : Prédiction du nombre de vélos loués par mois pour l’année 2019
+→ Problématique : Prédiction du nombre de vélos loués par mois pour
+l’année 2025
 
-Pages du site : 
-Page intro
-Page habitudes des utilisateurs 
-Page prédiction du nombre de vélos loués avec histogramme + tableau météo 
+Pages du site : 1. Page intro 2. Page habitudes des utilisateurs 3. Page
+prédiction du nombre de vélos loués avec histogramme + tableau météo
+
+## Intro
+
+Face à la congestion routière et à la pollution croissante, de
+nombreuses métropoles investissent dans des moyens de transports plus
+durables, comme le vélo en libre service. C'est notamment le cas de
+Séoul qui, a rejoint la tendance en 2015 avec son programme Seoul Bike,
+plus connu sous le nom de Ttareungyi. Ce programme permet aux habitants
+et aux visiteurs de louer des vélos à travers la ville à des prix
+abordables, favorisant un mode de transport écologique et réduisant la
+dépendance aux véhicules motorisés.
+
+Depuis sa mise en place, Seoul Bike a rencontré un succès franc et
+compte aujourd'hui plus de 800 stations à travers la ville. Une certaine
+logistique est donc indispensable pour assurer le bon fonctionnement du
+service et répondre à la demande croissante des utilisateurs. Prévoir le
+nombre de vélos nécessaires et identifier les facteurs clés qui
+influencent la demande de location peut grandement aider à fournir à la
+ville une offre stable de vélos.
+
+Le jeu de données utilisé pour répondre à cette problématique est
+composé de 14 variables : 1 variable réponse (le nombre de vélos loués),
+5 variables qualitatives liées à la temporalité et 8 variables
+quantitatives liées aux conditions météorologiques.
+
+[Variables réponse]{.underline} : nombre de vélos loués
+
+[Variables qualitatives]{.underline} :
+
+-   Date
+
+-   Heure de la journée
+
+-   Saison : hiver, printemps, été ou automne
+
+-   Vacances : oui ou non
+
+-   Jour de fonctionnement : oui ou non
+
+[Variables quantitatives]{.underline} :
+
+-   Température en celsius
+
+-   Humidité en %
+
+-   Vitesse du vent en m/s
+
+-   Visibilité en 10m
+
+-   Température du point de rosée en celsius
+
+-   Rayonnement solaire en MJ/m2
+
+-   Précipitation en mm
+
+-   Chutes de neige en cm
