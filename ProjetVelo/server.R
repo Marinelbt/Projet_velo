@@ -8,21 +8,45 @@
 #
 
 library(shiny)
+library(dygraphs)
+library(xts)
+library(lubridate)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
 
-    output$distPlot <- renderPlot({
-
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-
-    })
-
+  
+#TIM
+  
+  df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+  df$Date <- dmy(df$Date)
+  df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
+  df$DateHourtemp <- paste(df$Date, df$Hour)
+  df$DateHour <- ymd_hm(df$DateHourtemp)
+  print(df)
+  
+  output$linePlot <- renderDygraph({
+    req(input$dates)  
+    
+    start_date <- as.POSIXct(input$dates[1])
+    end_date <- as.POSIXct(input$dates[2])
+    
+    # Filtrer les données en fonction de la plage de dates sélectionnée
+    filtered_data <- subset(df, DateHour >= start_date & DateHour <= end_date)
+    
+    # Créer l'objet xts avec les données filtrées
+    dy_data <- xts(filtered_data$Rented.Bike.Count, order.by = filtered_data$DateHour)
+    
+    # Créer le graphique dygraph
+    dygraph(dy_data, main = "Graphique interactif avec dygraphs") %>%
+      dyAxis("x", label = "Date") %>%
+      dyAxis("y", label = "Vélos loués") %>%
+      dyOptions(strokeWidth = 2)
+  })
+  
+#ELISE
+  
+  
+#MARINE
+  
 }
