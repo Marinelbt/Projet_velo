@@ -11,7 +11,7 @@ fluidPage(
              tabPanel("Graphique",
                       "........................"),
              tabPanel("AFM",
-                      "........................")
+                      "......coucou..................")
               ),
     
     tabPanel(title = "Prediction",
