@@ -5,16 +5,17 @@ fluidPage(
   navbarPage(
     title = "My first app",
     tabPanel(title = "Presentation",
-             "................................."),
+             "................COUCOU C4EST TIM................."),
     
-    tabPanel(title = "Description des données",
+    navbarMenu(title = "Description des données",
              tabPanel("Graphique",
                       ".......C'est Marine................."),
              tabPanel("AFM",
-                      "........................")
+                      "......coucou..................")
               ),
     
     tabPanel(title = "Prediction",
              ".................................")
   )
 )
+
