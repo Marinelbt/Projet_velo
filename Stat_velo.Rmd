@@ -19,8 +19,14 @@ Variables explicatives : variables météo, variable vacances,
 → Problématique : Prédiction du nombre de vélos loués par mois pour
 l’année 2025
 
-Pages du site : 1. Page intro 2. Page habitudes des utilisateurs 3. Page
-prédiction du nombre de vélos loués avec histogramme + tableau météo
+Pages du site :
+
+1\. Page intro
+
+2\. Page habitudes des utilisateurs
+
+3\. Page prédiction du nombre de vélos loués avec histogramme + tableau
+météo
 
 ## Intro
 
@@ -77,3 +83,7 @@ quantitatives liées aux conditions météorologiques.
 -   Précipitation en mm
 
 -   Chutes de neige en cm
+
+```{r}
+dta <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+```
