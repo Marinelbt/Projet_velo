@@ -103,3 +103,14 @@ summary(dta)
 
 
 #Modele 
+
+```{r}
+modglm <- glm(data = dta, Rented.Bike.Count ~ . + Day:Month, family='gaussian')
+
+select <- stepwise(modglm, direction="forward", criterion="BIC")
+formula(select)
+```
+```{r}
+coef(select)
+```
+
