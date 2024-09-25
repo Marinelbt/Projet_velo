@@ -77,3 +77,14 @@ quantitatives liées aux conditions météorologiques.
 -   Précipitation en mm
 
 -   Chutes de neige en cm
+
+#Modele 
+
+```{r}
+dtamod <- read.table("SeoulBikeData.txt", sep=",", fileEncoding = "ISO-8859-1")
+
+summary(dtamod)
+
+
+```
+
