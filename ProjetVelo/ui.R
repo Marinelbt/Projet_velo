@@ -9,7 +9,7 @@ fluidPage(
     
     tabPanel(title = "Description des données",
              tabPanel("Graphique",
-                      "........................"),
+                      ".......C'est Marine................."),
              tabPanel("AFM",
                       "........................")
               ),
