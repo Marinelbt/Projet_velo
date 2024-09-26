@@ -94,6 +94,11 @@ dta$Day <- day(dta$Date)
 dta$Month <- month(dta$Date)
 dta$Year <- year(dta$Date)
 
+dta$Day <- as.factor(dta$Day)
+dta$Month <- as.factor(dta$Month)
+dta$Year <- as.factor(dta$Year)
+dta$Hour <- as.factor(dta$Hour)
+
 dta <- dta[,-1]
 
 dta <- dta[,c(1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,2)]
@@ -114,3 +119,13 @@ formula(select)
 coef(select)
 ```
 
+# AFM
+
+```{r}
+dta_MFA <- dta[,-1]
+summary(dta_MFA)
+
+require(FactoMineR)
+
+res_AFM <- MFA(dta_MFA, group=c(8,7),type=c("s","n"), name.group = c("Météo","Temporalité"))
+```

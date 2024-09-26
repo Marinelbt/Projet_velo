@@ -11,6 +11,7 @@ library(shiny)
 library(dygraphs)
 library(xts)
 library(lubridate)
+library(factoextra)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -46,6 +47,35 @@ function(input, output, session) {
   
 #ELISE
   
+  # Chargement des données - Si dta_MFA est déjà chargé
+  dta_MFA <- reactive({
+    dta_MFA <- dta[,-1]  # Suppression de la première colonne
+    return(dta_MFA)
+  })
+  
+  # Fonction qui effectue l'AFM
+  res_AFM <- eventReactive(input$run_afm, {
+    # Lancement de l'AFM lorsque l'utilisateur clique sur le bouton
+    dta_data <- dta_MFA()
+    res <- MFA(dta_data, 
+               group = c(8, 7),          # Nombre de variables dans chaque groupe
+               type = c("s", "n"),        # Type des variables : "s" pour quanti, "n" pour quali
+               name.group = c("Météo", "Temporalité"),
+               graph = FALSE)             # Désactivation des graphiques automatiques
+    return(res)
+  })
+  
+  # Résumé des résultats de l'AFM
+  output$afm_summary <- renderPrint({
+    req(res_AFM())  # Attendre que l'AFM soit lancée
+    summary(res_AFM())
+  })
+  
+  # Graphique de l'AFM
+  output$afm_plot <- renderPlot({
+    req(res_AFM())
+    fviz_mfa_var(res_AFM(), "group")  # Visualisation des groupes
+  })
   
 #MARINE
   
