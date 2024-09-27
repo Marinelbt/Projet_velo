@@ -39,10 +39,17 @@ function(input, output, session) {
     dy_data <- xts(filtered_data$Rented.Bike.Count, order.by = filtered_data$DateHour)
     
     # Créer le graphique dygraph
-    dygraph(dy_data, main = "Graphique interactif avec dygraphs") %>%
-      dyAxis("x", label = "Date") %>%
-      dyAxis("y", label = "Vélos loués") %>%
-      dyOptions(strokeWidth = 2)
+    dygraph(dy_data, main = "Graphique interactif avec highlight sur la courbe") %>%
+      dyAxis("x", label = "Date et heure") %>%
+      dyAxis("y", label = "Valeur") %>%
+      dyOptions(strokeWidth = 2, drawPoints = TRUE, pointSize = 3) %>%  # Agrandir les points
+      dyHighlight(
+        highlightCircleSize = 6,      # Taille du point surligné
+        highlightSeriesBackgroundAlpha = 0.3, # Fond semi-transparent
+        highlightSeriesOpts = list(strokeWidth = 3, strokeBorderWidth = 2, color = "red"), # Courbe surlignée
+        highlightSeriesBackgroundAlpha = 0.3
+      ) %>%
+      dyCrosshair(direction = "vertical")  # Ajouter une ligne verticale
   })
   
 #ELISE
