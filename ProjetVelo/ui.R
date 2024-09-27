@@ -99,7 +99,7 @@ fluidPage(
     ),
     
     tabPanel(title = "Prediction",
-             "..............NOBODY_LOL..................."),
+             "................................."),
     tabPanel("Rencontrez notre équipe",
     
     fluidRow(
