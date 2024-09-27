@@ -8,10 +8,12 @@
 #
 
 library(shiny)
-library(dygraphs)
+#library(dygraphs)
 library(xts)
 library(lubridate)
 library(factoextra)
+#library(htmlwidgets)
+library(plotly)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -19,6 +21,7 @@ function(input, output, session) {
   
 #TIM
   
+  #Création d'une variable avec la date et heure dans le bon format
   df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
   df$Date <- dmy(df$Date)
   df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
@@ -26,7 +29,7 @@ function(input, output, session) {
   df$DateHour <- ymd_hm(df$DateHourtemp)
   print(df)
   
-  output$linePlot <- renderDygraph({
+  output$linePlot <- renderPlotly({
     req(input$dates)  
     
     start_date <- as.POSIXct(input$dates[1])
@@ -38,11 +41,11 @@ function(input, output, session) {
     # Créer l'objet xts avec les données filtrées
     dy_data <- xts(filtered_data$Rented.Bike.Count, order.by = filtered_data$DateHour)
     
-    # Créer le graphique dygraph
-    dygraph(dy_data, main = "Graphique interactif avec dygraphs") %>%
-      dyAxis("x", label = "Date") %>%
-      dyAxis("y", label = "Vélos loués") %>%
-      dyOptions(strokeWidth = 2)
+    # Créer le graphique plotly
+    plot_ly(filtered_data, x = ~DateHour, y = ~Rented.Bike.Count, type = 'scatter', mode = 'lines+markers',
+            text = ~paste("Date:", DateHour, "<br>Valeur:", Rented.Bike.Count),
+            hoverinfo = 'text') %>%
+      layout(title = "Quantité de vélos loués dans la ville de séoul")
   })
   
 #ELISE

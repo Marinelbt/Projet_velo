@@ -64,16 +64,16 @@ fluidPage(
                         sidebarLayout(
                           sidebarPanel(
                             dateRangeInput("dates", 
-                                           "Sélectionner l'intervalle de dates :", 
+                                           "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
                                            end = "2018-11-30",
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
-                                           format = "yyyy-mm-dd")
+                                           format = "yyyy-mm-dd") # Choix des dates
                           ),
                           
                           mainPanel(
-                            dygraphOutput("linePlot")  # Utilisation de dygraph pour le graphique
+                            plotlyOutput("linePlot")  # Graphique
                           )
                         )),
                tabPanel("AFM",
