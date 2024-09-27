@@ -41,11 +41,20 @@ function(input, output, session) {
     # Créer l'objet xts avec les données filtrées
     dy_data <- xts(filtered_data$Rented.Bike.Count, order.by = filtered_data$DateHour)
     
-    # Créer le graphique plotly
-    plot_ly(filtered_data, x = ~DateHour, y = ~Rented.Bike.Count, type = 'scatter', mode = 'lines+markers',
-            text = ~paste("Date:", DateHour, "<br>Valeur:", Rented.Bike.Count),
-            hoverinfo = 'text') %>%
-      layout(title = "Quantité de vélos loués dans la ville de séoul")
+    if (input$graphSelect == "Graphique 1") {
+      # Créer le graphique plotly
+      plot_ly(filtered_data, x = ~DateHour, y = ~Rented.Bike.Count, type = 'scatter', mode = 'lines+markers',
+              text = ~paste("Date:", DateHour, "<br>Valeur:", Rented.Bike.Count),
+              hoverinfo = 'text') %>%
+        layout(title = "Quantité de vélos loués dans la ville de Séoul")
+      
+    } else if (input$graphSelect == "Graphique 2") {
+     
+    } else if (input$graphSelect == "Graphique 3") {
+      
+    }
+    
+    
   })
   
 #ELISE
