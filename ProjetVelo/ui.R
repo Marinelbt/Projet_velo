@@ -165,7 +165,7 @@ fluidPage(
                         h3("Marine Lebreton"),
                         img(src = "marine.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
                         p(" "),
-                        a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn", target = "_blank")
+                        a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn de Marine", target = "_blank")
                       )
                )
              )
