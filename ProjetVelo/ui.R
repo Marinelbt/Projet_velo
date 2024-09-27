@@ -1,6 +1,7 @@
 library(shiny)
 library(shinythemes)
 require(dygraphs)
+library(DT)
 
 
 #PROBLEMES : le graphique les bornes ne changent pas les graphiques
@@ -59,6 +60,31 @@ fluidPage(
       "................MARINE................."),
     
     navbarMenu(title = "Description des données",
+               tabPanel("Jeu de données",
+                        titlePanel("Structure du jeu de données"),
+                        fluidRow(
+                          column(12,
+                                 h3("Informations sur les données"),
+                                 h4("Nombre de lignes :"),
+                                 textOutput("nb_lignes"),
+                                 h4("Variable Réponse :"),
+                                 uiOutput("var_reponse"),   # Affichage de la variable réponse
+                                 h4("Variables Explicatives Quantitatives :"),
+                                 uiOutput("var_quant"),     # Affichage des variables quantitatives
+                                 h4("Variables Explicatives Qualitatives :"),
+                                 uiOutput("var_qual"),       # Affichage des variables qualitatives
+                                 p(""),
+                                 p(""),
+                                 h3("Aperçu du jeu de données")
+                          )
+                        ), 
+                        # Section Tableau de données
+                        fluidRow(
+                          column(12,
+                                 DTOutput("data_table")
+                          )
+                        )
+               ),
                tabPanel("Graphique",
                         ".......TIM.................",
                         sidebarLayout(
@@ -101,44 +127,44 @@ fluidPage(
     tabPanel(title = "Prediction",
              "..............NOBODY_LOL..................."),
     tabPanel("Rencontrez notre équipe",
-    
-    fluidRow(
-      # Carte pour le premier membre de l'équipe
-      column(4,  
-             div(
-               class = "card",
-               style = "padding: 20px; text-align: center;",
-               h3("Timéo Baudat"),
-               img(src = "tim.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
-               p(""),
-               a(href = "https://www.linkedin.com/in/timeo-baudat/", "Profil LinkedIn de Timéo", target = "_blank")
-             )
-      ),
-      
-      # Carte pour le deuxième membre de l'équipe
-      column(4,  
-             div(
-               class = "card",
-               style = "padding: 20px; text-align: center;",
-               h3("Élise Lonchampt"),
-               img(src = "élise.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
-               p(""),
-               a(href = "https://www.linkedin.com/in/%C3%A9lise-lonchampt-232705235/", "Profil LinkedIn d'Élise", target = "_blank")
-             )
-      ),
-      
-      # Carte pour le troisième membre de l'équipe
-      column(4,  
-             div(
-               class = "card",
-               style = "padding: 20px; text-align: center;",
-               h3("Marine Lebreton"),
-               img(src = "marine.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
-               p(" "),
-               a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn", target = "_blank")
+             
+             fluidRow(
+               # Carte pour le premier membre de l'équipe
+               column(4,  
+                      div(
+                        class = "card",
+                        style = "padding: 20px; text-align: center;",
+                        h3("Timéo Baudat"),
+                        img(src = "tim.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                        p(""),
+                        a(href = "https://www.linkedin.com/in/timeo-baudat/", "Profil LinkedIn de Timéo", target = "_blank")
+                      )
+               ),
+               
+               # Carte pour le deuxième membre de l'équipe
+               column(4,  
+                      div(
+                        class = "card",
+                        style = "padding: 20px; text-align: center;",
+                        h3("Élise Lonchampt"),
+                        img(src = "élise.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                        p(""),
+                        a(href = "https://www.linkedin.com/in/%C3%A9lise-lonchampt-232705235/", "Profil LinkedIn d'Élise", target = "_blank")
+                      )
+               ),
+               
+               # Carte pour le troisième membre de l'équipe
+               column(4,  
+                      div(
+                        class = "card",
+                        style = "padding: 20px; text-align: center;",
+                        h3("Marine Lebreton"),
+                        img(src = "marine.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                        p(" "),
+                        a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn", target = "_blank")
+                      )
                )
              )
-      )
     )
   )
 )
