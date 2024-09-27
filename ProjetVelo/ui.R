@@ -1,6 +1,6 @@
 library(shiny)
 library(shinythemes)
-require(dygraphs)
+#require(dygraphs)
 library(DT)
 library(plotly)
 
@@ -90,6 +90,9 @@ fluidPage(
                         ".......TIM.................",
                         sidebarLayout(
                           sidebarPanel(
+                            selectInput("graphSelect", 
+                                        "Choisir un graphique à afficher :",
+                                        choices = c("Graphique 1", "Graphique 2", "Graphique 3")),
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
