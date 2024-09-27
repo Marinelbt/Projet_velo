@@ -1,6 +1,6 @@
 library(shiny)
 library(shinythemes)
-require(dygraphs)
+#require(dygraphs)
 library(DT)
 
 
