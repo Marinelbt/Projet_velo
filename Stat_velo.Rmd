@@ -85,29 +85,23 @@ quantitatives liées aux conditions météorologiques.
 -   Chutes de neige en cm
 
 ```{r}
-dta <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+df <- read.table('SeoulBikeData.csv', sep = ";", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "UTF-8")
 
 library(lubridate)
 
-dta$Date <- dmy(dta$Date)
-dta$Day <- day(dta$Date)
-dta$Month <- month(dta$Date)
-dta$Year <- year(dta$Date)
+df$Date <- dmy(df$Date)
+df$Day <- day(df$Date)
+df$Month <- month(df$Date)
+df$Year <- year(df$Date)
 
-dta$Day <- as.factor(dta$Day)
-dta$Month <- as.factor(dta$Month)
-dta$Year <- as.factor(dta$Year)
-dta$Hour <- as.factor(dta$Hour)
+df$Day <- as.factor(df$Day)
+df$Month <- as.factor(df$Month)
+df$Year <- as.factor(df$Year)
 
-dta <- dta[,-1]
-
-dta <- dta[,c(1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,2)]
-
-summary(dta)
+summary(df)
 ```
 
-
-#Modele 
+#Modele
 
 ```{r}
 modglm <- glm(data = dta, Rented.Bike.Count ~ . + Day:Month, family='gaussian')
@@ -115,17 +109,55 @@ modglm <- glm(data = dta, Rented.Bike.Count ~ . + Day:Month, family='gaussian')
 select <- stepwise(modglm, direction="forward", criterion="BIC")
 formula(select)
 ```
+
 ```{r}
 coef(select)
 ```
 
-# AFM
+```{r}
+get_p_value <- function(x){
+  mod <- Anova(lm(Rented.Bike.Count ~ x, data = df), type ="III")
+  p_value <- summary(mod)$`Pr(>F)`[2]
+  return(p_value)
+}
+
+boxplot_var <-  function(input){
+    var_name <- deparse(substitute(input))
+    var_name <- modif_var_name(var_name)
+    boxplot(Rented.Bike.Count ~ input, data = df, 
+         xlab = var_name, 
+         ylab = "Nombre de vélos loués", 
+         main = "Distribution des vélos loués par heure")}
+
+quant_vars <- c("Température", "Humidité", "Vitesse du vent", 
+                  "Température du point de rosée", "Rayonnement solaire", 
+                  "Précipitations", "Chutes de neige")
+qual_vars <- c("Heure", "Jour", "Mois", "Saison", "Vacances", "Jour de fonctionnement")
+
+output$variablePlot <- renderPlot({
+  selected_var <- input$varSelect
+
+```
 
 ```{r}
-dta_MFA <- dta[,-1]
-summary(dta_MFA)
+# Créer un boxplot pour visualiser la distribution du nombre de vélos loués à chaque heure
+boxplot(Rented.Bike.Count ~ Hour, data = df, 
+        xlab = "Heure de la journée", 
+        ylab = "Nombre de vélos loués", 
+        main = "Distribution des vélos loués par heure")
 
-require(FactoMineR)
+require (ggplot2)
 
-res_AFM <- MFA(dta_MFA, group=c(8,7),type=c("s","n"), name.group = c("Météo","Temporalité"))
+
+
+autoplot(df, facets = TRUE) +
+  scale_x_continuous(breaks = 1998:2008)
+```
+
+# Analyse séries temporelles
+
+```{r}
+require (FactoMineR)
+dta_ACP <- dta
+
 ```

@@ -90,43 +90,27 @@ fluidPage(
                         ".......TIM.................",
                         sidebarLayout(
                           sidebarPanel(
-                            selectInput("graphSelect", 
-                                        "Choisir un graphique à afficher :",
-                                        choices = c("Graphique 1", "Graphique 2", "Graphique 3")),
+                            selectInput("varSelect", 
+                                        "Choisir la variable à analyser :",
+                                        choices = c("Température", "Humidité", "Vitesse du vent", 
+                                                    "Température du point de rosée", "Rayonnement solaire", 
+                                                    "Précipitations", "Chutes de neige", "Heure", "Jour", 
+                                                    "Mois", "Saisons", "Vacances", "Jour de fonctionnement")),
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
                                            end = "2018-11-30",
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
-                                           format = "yyyy-mm-dd") # Choix des dates
+                                           format = "yyyy-mm-dd"),
+                            verbatimTextOutput("anova_p_value"),
+                            uiOutput("significativite")  # Ajout ici
                           ),
-                          
                           mainPanel(
-                            plotlyOutput("linePlot")  # Graphique
+                            plotOutput("variablePlot")
                           )
-                        )),
-               tabPanel("AFM",
-                        titlePanel("Analyse Factorielle Multiple (AFM)"),
-                        
-                        sidebarLayout(
-                          sidebarPanel(
-                            h3("Chargement des données"),
-                            # Ajoutez ici des options pour uploader des données si besoin
-                            
-                            h3("Options de l'AFM"),
-                            actionButton("run_afm", "Lancer l'AFM")
-                          ),
-                          
-                          mainPanel(
-                            h4("Résumé de l'AFM"),
-                            verbatimTextOutput("afm_summary"),
-                            
-                            h4("Graphiques AFM"),
-                            plotOutput("afm_plot")
-                          )
-                        ))
-    ),
+                        )
+               ),
     
     tabPanel(title = "Prediction",
              "................................."),
@@ -171,5 +155,5 @@ fluidPage(
              )
     )
   )
-)
+))
 

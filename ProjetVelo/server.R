@@ -15,80 +15,77 @@ library(factoextra)
 #library(htmlwidgets)
 library(plotly)
 
+## Listes des fonctions
+
+modif_outpout_var <- function(x){
+  if (x == "Vitesse du vent"){x<-"Vitesse.du.vent"}
+  else if (x == "Température du point de rosée"){x<-"Température.du.point.de.rosée"}
+  else if (x == "Rayonnement solaire"){x<-"Rayonnement.solaire"}
+  else if (x == "Chutes de neige"){x<-"Chutes.de.neige"}
+  else if (x=="Jour de fonctionnement"){x<-"Jour.de.fonctionnement"}
+  else {x <- x}
+  return(x)
+}
+
+get_p_value <- function(x){
+  x <- modif_outpout_var (x)
+  mod <- Anova(lm(`Nombre de vélos loués` ~ df[[x]], data = df), type ="III")
+  p_value <- mod$`Pr(>F)`[2]
+  return(p_value)
+}
+
 # Define server logic required to draw a histogram
 function(input, output, session) {
 
   
 #TIM
   
-  #Création d'une variable avec la date et heure dans le bon format
-  df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+  # Importation du jeu de données et pré-traitement des variables
+  df <- read.table('SeoulBikeData.csv', sep = ";", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "UTF-8")
   df$Date <- dmy(df$Date)
   df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
   df$DateHourtemp <- paste(df$Date, df$Hour)
   df$DateHour <- ymd_hm(df$DateHourtemp)
-  print(df)
+  df$Date <- dmy(df$Date)
+  df$Jour <- day(df$Date)
+  df$Mois <- month(df$Date)
+  df$Année <- year(df$Date)
+  df$Jour <- as.factor(df$Jour)
+  df$Mois <- as.factor(df$Mois)
+  df$Année <- as.factor(df$Année)
+  df$Heure <- as.factor(df$Heure)
   
-  output$linePlot <- renderPlotly({
-    req(input$dates)  
-    
-    start_date <- as.POSIXct(input$dates[1])
-    end_date <- as.POSIXct(input$dates[2])
-    
-    # Filtrer les données en fonction de la plage de dates sélectionnée
-    filtered_data <- subset(df, DateHour >= start_date & DateHour <= end_date)
-    
-    # Créer l'objet xts avec les données filtrées
-    dy_data <- xts(filtered_data$Rented.Bike.Count, order.by = filtered_data$DateHour)
-    
-    if (input$graphSelect == "Graphique 1") {
-      # Créer le graphique plotly
-      plot_ly(filtered_data, x = ~DateHour, y = ~Rented.Bike.Count, type = 'scatter', mode = 'lines+markers',
-              text = ~paste("Date:", DateHour, "<br>Valeur:", Rented.Bike.Count),
-              hoverinfo = 'text') %>%
-        layout(title = "Quantité de vélos loués dans la ville de Séoul")
-      
-    } else if (input$graphSelect == "Graphique 2") {
-     
-    } else if (input$graphSelect == "Graphique 3") {
-      
+  # Identification des variables quantitatives et qualitatives
+  quant_vars <- c("Température", "Humidité", "Vitesse du vent", "Visibilité",
+                    "Température du point de rosée", "Rayonnement solaire", 
+                    "Précipitations", "Chutes de neige")
+  qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour de fonctionnement")
+  
+  # Création des graphiques
+  output$variablePlot <- renderPlot({
+    if (input$varSelect %in% quant_vars){
+      boxplot(`Nombre de vélos loués` ~ df[[input$varSelect]], data = df, 
+              xlab = input$varSelect, 
+              ylab = "Nombre de vélos loués", 
+              main = paste("Distribution des vélos loués par heure"))}
+
+    else if (input$varSelect %in% qual_vars){#TIM
+      }
+  })
+  
+  # Calcul de la p-value de l'ANOVA
+  p_value <- get_p_value(input$varSelect)
+  
+  # Affichage de la p-value
+  output$significativite <- renderUI({
+    if (p_value<=0.05){
+      wellPanel(
+        tags$h4(style = "color: green:",
+                paste ("La variable ", input$varSelect, " influence significativement le nombre de vélos loués."))
+      )
     }
-    
-    
   })
-  
-#ELISE
-  
-  # Chargement des données - Si dta_MFA est déjà chargé
-  dta_MFA <- reactive({
-    dta_MFA <- dta[,-1]  # Suppression de la première colonne
-    return(dta_MFA)
-  })
-  
-  # Fonction qui effectue l'AFM
-  res_AFM <- eventReactive(input$run_afm, {
-    # Lancement de l'AFM lorsque l'utilisateur clique sur le bouton
-    dta_data <- dta_MFA()
-    res <- MFA(dta_data, 
-               group = c(8, 7),          # Nombre de variables dans chaque groupe
-               type = c("s", "n"),        # Type des variables : "s" pour quanti, "n" pour quali
-               name.group = c("Météo", "Temporalité"),
-               graph = FALSE)             # Désactivation des graphiques automatiques
-    return(res)
-  })
-  
-  # Résumé des résultats de l'AFM
-  output$afm_summary <- renderPrint({
-    req(res_AFM())  # Attendre que l'AFM soit lancée
-    summary(res_AFM())
-  })
-  
-  # Graphique de l'AFM
-  output$afm_plot <- renderPlot({
-    req(res_AFM())
-    fviz_mfa_var(res_AFM(), "group")  # Visualisation des groupes
-  })
-  
+ 
 #MARINE
   
   # Calcul du nombre de lignes
