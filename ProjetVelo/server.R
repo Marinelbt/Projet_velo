@@ -82,77 +82,76 @@ function(input, output, session) {
                yaxis2 = list(title = input$varSelect, overlaying = "y", side = "right"),
                xaxis = list(title = "Date et Heure"),
                hovermode = "closest")  # Définir le mode de survol
-               
+      
     } else if (input$varSelect %in% qual_vars) {
       print("blabla")
       
     } 
     
   })
-      
-      #ELISE
-      
-      
-      #MARINE
-      
-      # Calcul du nombre de lignes
-      output$nb_lignes <- renderText({
-        nrow(df)
-      })
-      
-      output$var_reponse <- renderUI({
-        # Nom de la variable réponse et sa description
-        reponse_var <- list(
-          "Rented.Bike.Count" = "Nombre de vélos loués (Variable quantitative sans unité)" 
-        )
-        
-        # Formatage pour affichage de la variable réponse (sans gras)
-        HTML(paste(sapply(names(reponse_var), function(var) {
-          paste("<strong>", var, ":</strong> ", reponse_var[[var]])
-        }), collapse = "<br>"))
-      })
-      # Variables explicatives quantitatives avec descriptions et unités directement incluses
-      output$var_quant <- renderUI({
-        # Liste des variables quantitatives avec leurs unités et descriptions
-        quant_vars <- list(
-          "Temperature..C." = "Température en °C",
-          "Humidity..." = "Humidité en %",
-          "Wind.speed..m.s." = "Vitesse du vent en m/s",
-          "Visibility..10m." = "Visibilité en 10m",
-          "Dew.point.temperature..C." = "Température du point de rosée en °C",
-          "Solar.Radiation..MJ.m2." = "Rayonnement solaire en MJ/m2",
-          "Rainfall.mm." = "Précipitation en mm",
-          "Snowfall..cm." = "Chutes de neige en cm"
-        )
-        
-        HTML(paste(sapply(names(quant_vars), function(var) {
-          paste("<strong>", var, ":</strong> ", quant_vars[[var]])
-        }), collapse = "<br>"))
-      })
-      
-      # Variables explicatives qualitatives avec descriptions
-      output$var_qual <- renderUI({
-        # Liste des variables qualitatives avec descriptions
-        qual_vars <- list(
-          "Date" = "Date (jour, mois et année",
-          "Hour" = "Heure de la journée",
-          "Seasons" = "Saison : hiver, printemps, été ou automne",
-          "Holiday" = "Vacances : oui ou non",
-          "Functioning.Day" = "Jour de fonctionnement : oui ou non"
-        )
-        
-        # Formatage des variables qualitatives
-        HTML(paste(sapply(names(qual_vars), function(var) {
-          paste("<strong>", var, ":</strong> ", qual_vars[[var]])
-        }), collapse = "<br>"))
-      })
-      
-      #Visualisation du jeu de données 
-      output$data_table <- DT::renderDataTable({
-        DT::datatable(
-          df[,-(15:16)],  # Votre jeu de données
-          options = list(scrollX = TRUE)  # Activer le défilement horizontal
-        )
-      })
+  
+  #ELISE
+  
+  
+  #MARINE
+  
+  # Calcul du nombre de lignes
+  output$nb_lignes <- renderText({
+    nrow(df)
+  })
+  
+  output$var_reponse <- renderUI({
+    # Nom de la variable réponse et sa description
+    reponse_var <- list(
+      "Rented.Bike.Count" = "Nombre de vélos loués (Variable quantitative sans unité)" 
+    )
+    
+    # Formatage pour affichage de la variable réponse (sans gras)
+    HTML(paste(sapply(names(reponse_var), function(var) {
+      paste("<strong>", var, ":</strong> ", reponse_var[[var]])
+    }), collapse = "<br>"))
+  })
+  # Variables explicatives quantitatives avec descriptions et unités directement incluses
+  output$var_quant <- renderUI({
+    # Liste des variables quantitatives avec leurs unités et descriptions
+    quant_vars <- list(
+      "Temperature..C." = "Température en °C",
+      "Humidity..." = "Humidité en %",
+      "Wind.speed..m.s." = "Vitesse du vent en m/s",
+      "Visibility..10m." = "Visibilité en 10m",
+      "Dew.point.temperature..C." = "Température du point de rosée en °C",
+      "Solar.Radiation..MJ.m2." = "Rayonnement solaire en MJ/m2",
+      "Rainfall.mm." = "Précipitation en mm",
+      "Snowfall..cm." = "Chutes de neige en cm"
+    )
+    
+    HTML(paste(sapply(names(quant_vars), function(var) {
+      paste("<strong>", var, ":</strong> ", quant_vars[[var]])
+    }), collapse = "<br>"))
+  })
+  
+  # Variables explicatives qualitatives avec descriptions
+  output$var_qual <- renderUI({
+    # Liste des variables qualitatives avec descriptions
+    qual_vars <- list(
+      "Date" = "Date (jour, mois et année",
+      "Hour" = "Heure de la journée",
+      "Seasons" = "Saison : hiver, printemps, été ou automne",
+      "Holiday" = "Vacances : oui ou non",
+      "Functioning.Day" = "Jour de fonctionnement : oui ou non"
+    )
+    
+    # Formatage des variables qualitatives
+    HTML(paste(sapply(names(qual_vars), function(var) {
+      paste("<strong>", var, ":</strong> ", qual_vars[[var]])
+    }), collapse = "<br>"))
+  })
+  
+  #Visualisation du jeu de données 
+  output$data_table <- DT::renderDataTable({
+    DT::datatable(
+      df[,-(15:16)],  # Votre jeu de données
+      options = list(scrollX = TRUE)  # Activer le défilement horizontal
+    )
+  })
 }
-
