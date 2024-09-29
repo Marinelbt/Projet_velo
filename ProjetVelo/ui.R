@@ -92,25 +92,21 @@ fluidPage(
                           sidebarPanel(
                             selectInput("varSelect", 
                                         "Choisir la variable à analyser :",
-                                        choices = c("Température", "Humidité", "Vitesse du vent", 
-                                                    "Température du point de rosée", "Rayonnement solaire", 
-                                                    "Précipitations", "Chutes de neige", "Heure", "Jour", 
-                                                    "Mois", "Saisons", "Vacances", "Jour de fonctionnement")),
+                                        choices = names(df)[-c(1,2,15,16)]), 
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
                                            end = "2018-11-30",
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
-                                           format = "yyyy-mm-dd"),
-                            verbatimTextOutput("anova_p_value"),
-                            uiOutput("significativite")  # Ajout ici
+                                           format = "yyyy-mm-dd") # Choix des dates
                           ),
+                          
                           mainPanel(
-                            plotOutput("variablePlot")
+                            plotlyOutput("linePlot")  # Graphique
                           )
-                        )
-               ),
+                        )),
+    ),
     
     tabPanel(title = "Prediction",
              "................................."),
@@ -155,5 +151,4 @@ fluidPage(
              )
     )
   )
-))
-
+)

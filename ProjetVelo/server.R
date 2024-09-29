@@ -14,79 +14,86 @@ library(lubridate)
 library(factoextra)
 #library(htmlwidgets)
 library(plotly)
+library(tidyverse)
 
-## Listes des fonctions
 
-modif_outpout_var <- function(x){
-  if (x == "Vitesse du vent"){x<-"Vitesse.du.vent"}
-  else if (x == "Température du point de rosée"){x<-"Température.du.point.de.rosée"}
-  else if (x == "Rayonnement solaire"){x<-"Rayonnement.solaire"}
-  else if (x == "Chutes de neige"){x<-"Chutes.de.neige"}
-  else if (x=="Jour de fonctionnement"){x<-"Jour.de.fonctionnement"}
-  else {x <- x}
-  return(x)
-}
-
-get_p_value <- function(x){
-  x <- modif_outpout_var (x)
-  mod <- Anova(lm(`Nombre de vélos loués` ~ df[[x]], data = df), type ="III")
-  p_value <- mod$`Pr(>F)`[2]
-  return(p_value)
-}
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
-
   
-#TIM
   
-  # Importation du jeu de données et pré-traitement des variables
-  df <- read.table('SeoulBikeData.csv', sep = ";", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "UTF-8")
+  #TIM
+  
+  #Création d'une variable avec la date et heure dans le bon format
+  df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
   df$Date <- dmy(df$Date)
   df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
   df$DateHourtemp <- paste(df$Date, df$Hour)
   df$DateHour <- ymd_hm(df$DateHourtemp)
-  df$Date <- dmy(df$Date)
   df$Jour <- day(df$Date)
   df$Mois <- month(df$Date)
   df$Année <- year(df$Date)
-  df$Jour <- as.factor(df$Jour)
-  df$Mois <- as.factor(df$Mois)
-  df$Année <- as.factor(df$Année)
-  df$Heure <- as.factor(df$Heure)
+  str(df)
   
-  # Identification des variables quantitatives et qualitatives
+  colnames(df) <- c("Date", "Rented.Bike.Count", "Heure", "Température",
+                    "Humidité", "Vitesse du vent", "Visibilité", 
+                    "Température du point de rosée",
+                    "Rayonnement solaire", "Précipitations", "Chutes de neige", "Saisons",
+                    "Vacances", "Jour de fonctionnement", "DateHourTemp", "DateHour", "Jour",
+                    "Mois","Annee")
+  
   quant_vars <- c("Température", "Humidité", "Vitesse du vent", "Visibilité",
-                    "Température du point de rosée", "Rayonnement solaire", 
-                    "Précipitations", "Chutes de neige")
+                  "Température du point de rosée", "Rayonnement solaire", 
+                  "Précipitations", "Chutes de neige")
   qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour de fonctionnement")
   
-  # Création des graphiques
-  output$variablePlot <- renderPlot({
-    if (input$varSelect %in% quant_vars){
-      boxplot(`Nombre de vélos loués` ~ df[[input$varSelect]], data = df, 
-              xlab = input$varSelect, 
-              ylab = "Nombre de vélos loués", 
-              main = paste("Distribution des vélos loués par heure"))}
-
-    else if (input$varSelect %in% qual_vars){#TIM
-      }
+  output$linePlot <- renderPlotly({
+    req(input$dates)  
+    
+    start_date <- as.POSIXct(input$dates[1])
+    end_date <- as.POSIXct(input$dates[2])
+    
+    # Filtrer les données en fonction de la plage de dates sélectionnée
+    filtered_data <- subset(df, DateHour >= start_date & DateHour <= end_date)
+    
+    # Créer l'objet xts avec les données filtrées
+    dy_data <- xts(filtered_data$Rented.Bike.Count, order.by = filtered_data$DateHour)
+    
+    if (input$varSelect %in% quant_vars) {
+      
+      plot_ly(filtered_data, 
+              x = ~DateHour, 
+              y = ~Rented.Bike.Count, 
+              type = 'scatter', 
+              mode = 'lines+markers',
+              text = ~paste("Date:", DateHour, "<br>Valeur:", Rented.Bike.Count),
+              name = "Nombre de vélos loués",
+              hoverinfo = 'text') %>%
+        # Ajouter la deuxième variable sélectionnée par l'utilisateur
+        add_trace(y = ~filtered_data[[input$varSelect]],  
+                  type = 'scatter', 
+                  mode = 'lines+markers', 
+                  text = ~paste("Date:", DateHour, "<br>Valeur:", filtered_data[[input$varSelect]]),
+                  hoverinfo = 'text', 
+                  name = input$varSelect, 
+                  yaxis = "y2")  %>% 
+        layout(title = "Quantité de vélos loués dans la ville de Séoul",
+               yaxis = list(title = "Vélos loués"),
+               yaxis2 = list(title = input$varSelect, overlaying = "y", side = "right"),
+               xaxis = list(title = "Date et Heure"),
+               hovermode = "closest")  # Définir le mode de survol
+      
+    } else if (input$varSelect %in% qual_vars) {
+      print("blabla")
+      
+    } 
+    
   })
   
-  # Calcul de la p-value de l'ANOVA
-  p_value <- get_p_value(input$varSelect)
+  #ELISE
   
-  # Affichage de la p-value
-  output$significativite <- renderUI({
-    if (p_value<=0.05){
-      wellPanel(
-        tags$h4(style = "color: green:",
-                paste ("La variable ", input$varSelect, " influence significativement le nombre de vélos loués."))
-      )
-    }
-  })
- 
-#MARINE
+  
+  #MARINE
   
   # Calcul du nombre de lignes
   output$nb_lignes <- renderText({
@@ -122,7 +129,7 @@ function(input, output, session) {
       paste("<strong>", var, ":</strong> ", quant_vars[[var]])
     }), collapse = "<br>"))
   })
-
+  
   # Variables explicatives qualitatives avec descriptions
   output$var_qual <- renderUI({
     # Liste des variables qualitatives avec descriptions
@@ -148,4 +155,3 @@ function(input, output, session) {
     )
   })
 }
-
