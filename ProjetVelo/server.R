@@ -42,6 +42,13 @@ function(input, output, session) {
                     "Vacances", "Jour de fonctionnement", "DateHourTemp", "DateHour", "Jour",
                     "Mois","Annee")
   
+  df$Heure <- as.factor(df$Heure)
+  df$Jour <- as.factor(df$Jour)
+  df$Mois <- as.factor(df$Mois)
+  df$Saisons <- as.factor(df$Saisons)
+  df$Vacances <- as.factor(df$Vacances)
+  df$`Jour de fonctionnement` <- as.factor(df$`Jour de fonctionnement`)
+  
   quant_vars <- c("Température", "Humidité", "Vitesse du vent", "Visibilité",
                   "Température du point de rosée", "Rayonnement solaire", 
                   "Précipitations", "Chutes de neige")
@@ -84,7 +91,16 @@ function(input, output, session) {
                hovermode = "closest")  # Définir le mode de survol
       
     } else if (input$varSelect %in% qual_vars) {
-      print("blabla")
+      plot_ly(filtered_data, 
+              x = ~filtered_data[[input$varSelect]], 
+              y = ~Rented.Bike.Count, 
+              type = 'box', 
+              boxpoints = 'all', 
+              jitter = 0.3, 
+              pointpos = -1.8) %>%
+        layout(title = "Quantité de vélos loués dans la ville de Séoul",
+               xaxis = list(title = input$varSelect, overlaying = "y", side = "right"),
+               yaxis = list(title = "Vélos loués"))
       
     } 
     
