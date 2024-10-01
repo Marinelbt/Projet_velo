@@ -11,9 +11,129 @@ library(tidyverse)
 
 # Define UI for application
 fluidPage(
-  theme = shinytheme("cerulean"),
+  #theme = shinytheme("cerulean"),
+  # Ajout de styles personnalisés via CSS
+  tags$head(
+    tags$style(HTML("
+      /* Couleur du bandeau */
+      .navbar {
+        background-color: #ec5030 !important;  /* Bordeaux clair */
+      }
+      
+      /* Couleur du texte des onglets et du titre */
+      .navbar-default .navbar-nav > li > a, 
+      .navbar-default .navbar-brand {
+        color: white !important;  /* Texte en blanc par défaut */
+      }
+      
+      /* Couleur de l'onglet au survol */
+      .navbar-default .navbar-nav > li > a:hover {
+        background-color: #660000 !important;  /* Rouge foncé au survol */
+        color: white !important;  /* Texte blanc au survol */
+      }
+      
+      /* État de l'onglet actif (sélectionné) */
+      .navbar-default .navbar-nav > .active > a {
+        background-color: #660000 !important;  /* Rouge foncé tant que l'onglet est actif */
+        color: white !important;  /* Texte blanc */
+      }
+
+      /* Garder la couleur de l'onglet actif au survol */
+      .navbar-default .navbar-nav > .active > a:hover {
+        background-color: #660000 !important;  /* Garder rouge foncé au survol */
+        color: white !important;  /* Texte blanc */
+      }
+
+      /* Sous-onglets (dropdown) au survol */
+      .navbar-default .navbar-nav .dropdown-menu > li > a:hover {
+        background-color: #660000 !important;  /* Rouge foncé pour les sous-onglets */
+        color: white !important;  /* Texte blanc */
+      }
+
+      /* Conserver la couleur rouge foncé pour le sous-onglet actif */
+      .navbar-default .navbar-nav .dropdown-menu > .active > a {
+        background-color: #660000 !important;  /* Rouge foncé pour le sous-onglet actif */
+        color: white !important;  /* Texte blanc */
+      }
+
+      /* Pour maintenir l'onglet actif en rouge foncé, même lorsque des sous-onglets sont sélectionnés */
+      .navbar-default .navbar-nav .dropdown.open > a {
+        background-color: #660000 !important;  /* Rouge foncé quand le dropdown est ouvert */
+        color: white !important;  /* Texte blanc */
+      }
+      
+      /* Couleur des titres de section */
+      h1, h2, h3, h4, h5, h6 {
+        color: #662a2a !important;  /* Rouge foncé pour tous les titres */
+      }
+      
+      /* Couleur des liens hypertexte */
+    a {
+      color: #651515q  !important;  /* Rouge foncé pour les liens */
+    }
+
+    /* Couleur des liens au survol */
+    a:hover {
+      color: #ec5030 !important;  /* Bordeaux clair au survol */
+    }
+    
+    
+    
+    /* Style du bouton principal */
+      .stylish-button {
+        background-color: #660000; /* Rouge foncé */
+        color: white; /* Texte en blanc */
+        border: none; /* Pas de bordure */
+        border-radius: 5px; /* Coins arrondis */
+        padding: 10px 20px; /* Espacement interne */
+        font-size: 16px; /* Taille de police */
+        cursor: pointer; /* Changer le curseur au survol */
+        transition: background-color 0.3s; /* Animation douce */
+      }
+
+      /* Changer le style au survol */
+      .stylish-button:hover {
+        background-color: #ec5030; /* Bordeaux clair au survol */
+      }
+
+      /* Style du bouton pour la blague */
+      .small-button {
+        background-color: #660000; /* Rouge foncé */
+        color: white; /* Texte en blanc */
+        border: none; /* Pas de bordure */
+        border-radius: 5px; /* Coins arrondis */
+        padding: 5px 10px; /* Espacement interne réduit pour un bouton plus petit */
+        font-size: 12px; /* Taille de police réduite */
+        cursor: pointer; /* Changer le curseur au survol */
+        transition: background-color 0.3s; /* Animation douce */
+      }
+
+      /* Changer le style au survol */
+      .small-button:hover {
+        background-color: #ec5030; /* Bordeaux clair au survol */
+      }
+
+      /* Positionner le conteneur de boutons en bas à gauche */
+      .button-container {
+        position: fixed; /* Positionnement fixe */
+        bottom: 20px; /* 20 pixels du bas */
+        left: 20px; /* 20 pixels de gauche */
+        z-index: 1000; /* S'assurer que le conteneur est au-dessus des autres éléments */
+      }
+
+      /* Style pour le texte de la blague */
+      .joke-text {
+        margin-left: 10px; /* Espacement à gauche du texte de la blague */
+        color: #660000; /* Couleur du texte de la blague */
+        font-size: 14px; /* Taille de police pour le texte de la blague */
+      }
+    
+    "))
+  ),
   navbarPage(
-    title = "Projet Shiny",
+    title = div(
+      img(src = "logo.png", height = "40px", style = "margin-top: -10px;")  # Ajuste la hauteur et la position de l'image si nécessaire
+    ),
     
     # Premier onglet - Présentation
     tabPanel(
@@ -166,6 +286,14 @@ fluidPage(
                         a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn de Marine", target = "_blank")
                       )
                )
+             ),
+             tags$div(class = "button-container",
+                      actionButton("joke_button", "Raconter une blague sur le vélo", class = "small-button"),
+                      textOutput("joke_text", container = span, inline = TRUE)  # Affiche la blague à côté du bouton
+             ),
+             tags$div(
+               style = "position: fixed; bottom: 20px; right: 20px; z-index: 1000;",  # Style pour la position
+               img(src = "logoIARA.jpeg", style = "max-width: 200px; height: auto;")  # Garde le ratio d'aspect
              )
     )
   )
