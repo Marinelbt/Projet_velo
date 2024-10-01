@@ -138,8 +138,6 @@ fluidPage(
     tabPanel(
       title = "Introduction",
       
-      titlePanel("Introduction"),
-      
       fluidRow(
         # Colonne de gauche pour le texte
         column(8,  # 8 sur 12 colonnes pour le texte
@@ -172,13 +170,7 @@ fluidPage(
                img(src = "photo.jpg", style = "max-width: 100%; height: auto; margin-top: 50px;")
         )
       ),
-      
-      # Deuxième section - Problématique
-      h2("Problématique"),
-      p("Faut qu'on trouve une problématique."),
-      
-      # Texte de séparation ou signature
-      "................MARINE................."),
+),
     
     navbarMenu(title = "Description des données",
                tabPanel("Jeu de données",
