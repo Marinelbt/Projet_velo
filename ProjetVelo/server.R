@@ -109,6 +109,11 @@ function(input, output, session) {
   #ELISE
   
   
+  # Logique pour afficher la blague lorsque le bouton est cliqué
+  output$joke_text <- renderText({
+    req(input$joke_button)  # Nécessite que le bouton soit cliqué
+    "Pourquoi les vélos sont-ils toujours fatigués? Parce qu'ils ont des pneus crevés!"
+  })
   #MARINE
   
   # Calcul du nombre de lignes
