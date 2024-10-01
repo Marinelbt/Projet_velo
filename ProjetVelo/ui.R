@@ -138,8 +138,6 @@ fluidPage(
     tabPanel(
       title = "Introduction",
       
-      titlePanel("Introduction"),
-      
       fluidRow(
         # Colonne de gauche pour le texte
         column(8,  # 8 sur 12 colonnes pour le texte
