@@ -3,7 +3,7 @@ library(shinythemes)
 #require(dygraphs)
 library(DT)
 library(plotly)
-library(tidy)
+library(tidyverse)
 
 
 #PROBLEMES : le graphique les bornes ne changent pas les graphiques
@@ -110,7 +110,24 @@ fluidPage(
     ),
     
     tabPanel(title = "Prediction",
-             "................................."),
+             titlePanel("Prédiction du nombre de vélos loués"),
+             sidebarLayout(
+               sidebarPanel(
+                 fileInput("file1", "Choisir un fichier CSV",
+                           accept = c("text/csv",
+                                      "text/comma-separated-values,text/plain",
+                                      ".csv")),
+                 tags$hr(),
+                 actionButton("predict", "Faire la prédiction")
+               ),
+               
+               mainPanel(
+                 h3("Graphique des prédictions du nombre de vélos loués par heure"),
+                 dygraphOutput("dygraph_predictions")
+               )
+             )
+    ),
+    
     tabPanel("Rencontrez notre équipe",
              
              fluidRow(

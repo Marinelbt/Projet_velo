@@ -111,6 +111,8 @@ function(input, output, session) {
   
   #MARINE
   
+  #1) ONGLET STRUCTURE DU JEU DE DONNEES
+  
   # Calcul du nombre de lignes
   output$nb_lignes <- renderText({
     nrow(df)
@@ -170,4 +172,83 @@ function(input, output, session) {
       options = list(scrollX = TRUE)  # Activer le défilement horizontal
     )
   })
+  
+  # 2) ONGLET PREDICTION 
+  
+  # Lecture du fichier importé
+  new_data <- reactive({
+    req(input$file1)
+    newdata <- read.csv(input$file1$datapath, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+    
+    # Vérification des colonnes attendues
+    expected_columns <- c("Heure", "Température", "Humidité", "Vitesse.du.vent", 
+                          "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
+                          "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
+                          "Jour.de.fonctionnement", "Jour.de.la.semaine", "Mois")
+    
+    if(!all(expected_columns %in% names(newdata))) {
+      stop("Le fichier CSV ne contient pas les colonnes nécessaires.")
+    }
+    
+    # Convertir les colonnes en facteurs
+    newdata$Heure <- as.factor(newdata$Heure)  # Reste en tant que facteur
+    newdata$Jour.de.la.semaine <- as.factor(newdata$Jour.de.la.semaine)
+    newdata$Mois <- as.factor(newdata$Mois)
+    
+    return(newdata)
+  })
+  
+  df_mod <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+  df_mod$Date <- dmy(df_mod$Date)
+  df_mod$Hour <- as.factor(df_mod$Hour)  # Gardez comme facteur
+  df_mod$Jour.de.la.semaine <- as.factor(format(df_mod$Date, "%u"))
+  df_mod$Mois <- as.factor(month(df_mod$Date))
+  
+  df_mod <- df_mod[,2:16]
+  
+  colnames(df_mod) <- c("Rented.Bike.Count", "Heure", "Température",
+                        "Humidité", "Vitesse.du.vent", "Visibilité", 
+                        "Température.du.point.de.rosée",
+                        "Rayonnement.solaire", "Précipitations", "Chutes.de.neige", "Saisons",
+                        "Vacances", "Jour.de.fonctionnement", "Jour.de.la.semaine",
+                        "Mois")
+  
+  # Faire la prédiction lorsque l'utilisateur appuie sur le bouton
+  observeEvent(input$predict, {
+    req(new_data())  # S'assurer que les données sont chargées
+    
+    # Modèle que vous avez déjà créé (utilisez votre modèle ici)
+    modglm <- glm(Rented.Bike.Count ~ ., family = 'poisson', data = df_mod)  # Remplacez df_mod par votre jeu de données
+    
+    # Prédiction sur les nouvelles données
+    predictions <- predict(modglm, newdata = new_data(), type = "response")
+    
+    # Ajouter les prédictions au jeu de données importé
+    df_predictions <- new_data()
+    df_predictions$Predicted <- predictions
+    
+    # Créer la variable DateHour à partir de Heure (en supposant que vous avez un format temporel fixe)
+    # Par exemple, en utilisant une base fixe pour la date (ex: le 1er janvier 2024)
+    base_date <- "2024-01-01"  # Assurez-vous que cette date convient à votre contexte
+    df_predictions$DateHour <- as.POSIXct(paste(base_date, sprintf("%02d:00:00", as.numeric(as.character(df_predictions$Heure)))), tz = "UTC")
+    
+    # Vérifiez les longueurs
+    if (length(df_predictions$Predicted) != length(df_predictions$DateHour)) {
+      stop("Les longueurs des prédictions et des DateHour ne correspondent pas.")
+    }
+    
+    # Convertir les données en xts pour dygraphs
+    df_xts <- xts(df_predictions$Predicted, order.by = df_predictions$DateHour)
+    
+    # Afficher les prédictions dans un graphique interactif
+    output$dygraph_predictions <- renderDygraph({
+      dygraph(df_xts, main = "Prédiction du nombre de vélos loués par heure") %>%
+        dyAxis("y", label = "Nombre de vélos loués") %>%
+        dyAxis("x", label = "Heure de la journée")
+    })
+  })
+  
+  
+
+  
 }
