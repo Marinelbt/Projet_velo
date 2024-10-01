@@ -207,19 +207,19 @@ fluidPage(
                         )
                ),
                tabPanel("Graphique",
-                        ".......TIM.................",
                         sidebarLayout(
                           sidebarPanel(
                             selectInput("varSelect", 
                                         "Choisir la variable à analyser :",
-                                        choices = names(df)[-c(1,2,15,16)]), 
+                                        choices = names(df)[-c(1,2,15,16,19)]), 
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
                                            end = "2018-11-30",
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
-                                           format = "yyyy-mm-dd") # Choix des dates
+                                           format = "yyyy-mm-dd"), # Choix des dates
+                            uiOutput("anova_result") # Affichage du résultat de l'ANOVA
                           ),
                           
                           mainPanel(
