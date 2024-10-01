@@ -1,0 +1,84 @@
+---
+title: "predict"
+author: "Marine"
+date: "2024-09-29"
+output: html_document
+---
+
+#Importation
+
+```{r}
+library(shiny)
+library(dygraphs)
+library(xts)
+library(lubridate)
+library(factoextra)
+library(RcmdrMisc)
+```
+
+
+#Importation du jeu de données 
+
+```{r}
+df_mod <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+df_mod$Date <- dmy(df_mod$Date)
+df_mod$Hour <- as.factor(sprintf("%02d", df_mod$Hour))
+df_mod$Jour.de.la.semaine <- as.factor(format(df_mod$Date, "%u"))
+df_mod$Mois <- as.factor(month(df_mod$Date))
+
+colnames(df_mod) <- c("Date", "Rented.Bike.Count", "Heure", "Température",
+                "Humidité", "Vitesse.du.vent", "Visibilité", 
+                "Température.du.point.de.rosée",
+                "Rayonnement.solaire", "Précipitations", "Chutes.de.neige", "Saisons",
+                "Vacances", "Jour.de.fonctionnement", "Jour.de.la.semaine",
+                "Mois")
+
+```
+
+
+#Prédiction du nombre de vélo loués par jour 
+
+L'utilisateur va pouvoir voir la prédiction du nombre de vélos loués par jour en
+une semaine
+
+```{r}
+
+```
+
+#Prédiction du nombre de vélo loués par heure 
+
+L'utilisateur de l'appli va pouvoir choisir le jour et il aura la prédiction 
+du nbr de vélo loués par heure 
+
+## Création du modèle 
+
+```{r}
+
+modglm <- glm(data = df_mod[,2:16], Rented.Bike.Count ~ ., family='poisson')
+
+select <- stepwise(modglm, direction="forward", criterion="BIC")
+formula(select)
+
+coef(select)
+
+#On conserve le modèle initial 
+
+```
+
+## Pour l'instant on utilise un jeu de données test pour prédire 
+
+```{r}
+#Pour tester j'utilise la première semaine qu'on devra prédire 
+df_test <- df_mod[df_mod$Date >= "2017-12-01" & df_mod$Date <= "2017-12-07", ]
+
+predictions_test <- predict(modglm, newdata = df_test[,2:16], type = "response")
+results <- data.frame(Actual = df_test$Rented.Bike.Count, Predicted = predictions_test)
+
+rmse <- sqrt(mean((results$Actual - results$Predicted)^2))
+
+```
+
+
+
+
+

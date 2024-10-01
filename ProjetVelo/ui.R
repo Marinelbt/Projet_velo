@@ -3,6 +3,7 @@ library(shinythemes)
 #require(dygraphs)
 library(DT)
 library(plotly)
+library(tidy)
 
 
 #PROBLEMES : le graphique les bornes ne changent pas les graphiques
