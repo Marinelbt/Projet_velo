@@ -40,7 +40,7 @@ function(input, output, session) {
                     "Température du point de rosée",
                     "Rayonnement solaire", "Précipitations", "Chutes de neige", "Saisons",
                     "Vacances", "Jour de fonctionnement", "DateHourTemp", "DateHour", "Jour",
-                    "Mois","Annee")
+                    "Mois","Année")
   
   df$Heure <- as.factor(df$Heure)
   df$Jour <- as.factor(df$Jour)
@@ -72,18 +72,19 @@ function(input, output, session) {
               x = ~DateHour, 
               y = ~Rented.Bike.Count, 
               type = 'scatter', 
-              mode = 'lines+markers',
+              mode = 'lines',
               text = ~paste("Date:", DateHour, "<br>Valeur:", Rented.Bike.Count),
               name = "Nombre de vélos loués",
               hoverinfo = 'text') %>%
         # Ajouter la deuxième variable sélectionnée par l'utilisateur
         add_trace(y = ~filtered_data[[input$varSelect]],  
                   type = 'scatter', 
-                  mode = 'lines+markers', 
+                  mode = 'lines', 
                   text = ~paste("Date:", DateHour, "<br>Valeur:", filtered_data[[input$varSelect]]),
                   hoverinfo = 'text', 
                   name = input$varSelect, 
-                  yaxis = "y2")  %>% 
+                  yaxis = "y2",
+                  line = list(color='green'))  %>% 
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
                yaxis = list(title = "Vélos loués"),
                yaxis2 = list(title = input$varSelect, overlaying = "y", side = "right"),
@@ -94,10 +95,7 @@ function(input, output, session) {
       plot_ly(filtered_data, 
               x = ~filtered_data[[input$varSelect]], 
               y = ~Rented.Bike.Count, 
-              type = 'box', 
-              boxpoints = 'all', 
-              jitter = 0.3, 
-              pointpos = -1.8) %>%
+              type = 'box') %>%
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
                xaxis = list(title = input$varSelect, overlaying = "y", side = "right"),
                yaxis = list(title = "Vélos loués"))
@@ -106,7 +104,18 @@ function(input, output, session) {
     
   })
   
-  #ELISE
+  # ANOVA pour évaluer l'impact de la variable choisie sur le nombre de vélos loués
+  output$anova_result <- renderText({
+    req(filtered_data())
+    aov_model <- aov(Rented.Bike.Count ~ filtered_data()[[input$varSelect]], data = filtered_data())
+    anova_summary <- summary(aov_model)
+    p_value <- anova_summary[[1]][["Pr(>F)"]][1]
+    if (significant) {
+      paste("La variable", input$varSelect, "a un impact significatif sur le nombre de vélos loués.")
+    } else {
+      paste("La variable", input$varSelect, "n'a pas d'impact significatif sur le nombre de vélos loué.")
+    }
+  })
   
   
   #MARINE
