@@ -99,7 +99,7 @@ fluidPage(
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
                                            format = "yyyy-mm-dd"), # Choix des dates
-                            textOutput("anova_result") # Affichage du résultat de l'ANOVA
+                            uiOutput("anova_result") # Affichage du résultat de l'ANOVA
                           ),
                           
                           mainPanel(
