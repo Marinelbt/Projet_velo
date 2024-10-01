@@ -157,7 +157,18 @@ autoplot(df, facets = TRUE) +
 # Analyse séries temporelles
 
 ```{r}
-require (FactoMineR)
-dta_ACP <- dta
-
+        # Calcul du coefficient de corrélation pour variables quanti
+    if (input$varSelect %in% quant_vars) {
+      tryCatch({
+        coeff_corr <- cor(dta$Rented.Bike.Count, dta[[input$varSelect]], use = "complete.obs")
+        result_text <- paste(result_text, "<strong>Coefficient de coorélation :", round(coeff_corr, 3), ".</strong>")
+      }, error = function(e) {
+        result_text <- paste(result_text, "<strong>Impossible de calculer la corrélation pour la variable sélectionnée.</strong>")}
+      
+    # Encadrement du text
+    HTML(paste(
+      '<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+      result_text,
+      '</div>')))
+    }
 ```

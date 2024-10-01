@@ -22,7 +22,7 @@ library(tidyverse)
 function(input, output, session) {
   
   
-  #TIM
+  #TIM et ELISE
   
   #Création d'une variable avec la date et heure dans le bon format
   df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
@@ -40,7 +40,7 @@ function(input, output, session) {
                     "Température du point de rosée",
                     "Rayonnement solaire", "Précipitations", "Chutes de neige", "Saisons",
                     "Vacances", "Jour de fonctionnement", "DateHourTemp", "DateHour", "Jour",
-                    "Mois","Annee")
+                    "Mois","Année")
   
   df$Heure <- as.factor(df$Heure)
   df$Jour <- as.factor(df$Jour)
@@ -54,36 +54,39 @@ function(input, output, session) {
                   "Précipitations", "Chutes de neige")
   qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour de fonctionnement")
   
-  output$linePlot <- renderPlotly({
+  # Encapsulation des données filtrées dans une fonction réactive
+  filtered_data <- reactive({
     req(input$dates)  
     
     start_date <- as.POSIXct(input$dates[1])
     end_date <- as.POSIXct(input$dates[2])
     
     # Filtrer les données en fonction de la plage de dates sélectionnée
-    filtered_data <- subset(df, DateHour >= start_date & DateHour <= end_date)
-    
-    # Créer l'objet xts avec les données filtrées
-    dy_data <- xts(filtered_data$Rented.Bike.Count, order.by = filtered_data$DateHour)
+    subset(df, DateHour >= start_date & DateHour <= end_date)
+  })
+  
+  output$linePlot <- renderPlotly({
+    dta <- filtered_data()
     
     if (input$varSelect %in% quant_vars) {
       
-      plot_ly(filtered_data, 
+      plot_ly(dta, 
               x = ~DateHour, 
               y = ~Rented.Bike.Count, 
               type = 'scatter', 
-              mode = 'lines+markers',
+              mode = 'lines',
               text = ~paste("Date:", DateHour, "<br>Valeur:", Rented.Bike.Count),
               name = "Nombre de vélos loués",
               hoverinfo = 'text') %>%
         # Ajouter la deuxième variable sélectionnée par l'utilisateur
-        add_trace(y = ~filtered_data[[input$varSelect]],  
+        add_trace(y = ~dta[[input$varSelect]],  
                   type = 'scatter', 
-                  mode = 'lines+markers', 
-                  text = ~paste("Date:", DateHour, "<br>Valeur:", filtered_data[[input$varSelect]]),
+                  mode = 'lines', 
+                  text = ~paste("Date:", DateHour, "<br>Valeur:", dta[[input$varSelect]]),
                   hoverinfo = 'text', 
                   name = input$varSelect, 
-                  yaxis = "y2")  %>% 
+                  yaxis = "y2",
+                  line = list(color='green'))  %>% 
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
                yaxis = list(title = "Vélos loués"),
                yaxis2 = list(title = input$varSelect, overlaying = "y", side = "right"),
@@ -91,23 +94,35 @@ function(input, output, session) {
                hovermode = "closest")  # Définir le mode de survol
       
     } else if (input$varSelect %in% qual_vars) {
-      plot_ly(filtered_data, 
-              x = ~filtered_data[[input$varSelect]], 
+      plot_ly(dta, 
+              x = ~dta[[input$varSelect]], 
               y = ~Rented.Bike.Count, 
-              type = 'box', 
-              boxpoints = 'all', 
-              jitter = 0.3, 
-              pointpos = -1.8) %>%
+              type = 'box') %>%
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
                xaxis = list(title = input$varSelect, overlaying = "y", side = "right"),
                yaxis = list(title = "Vélos loués"))
-      
     } 
-    
   })
   
-  #ELISE
-  
+  # Info sur variable
+  output$anova_result <- renderUI({
+    dta <- filtered_data()
+    result_text <- ""
+    
+    ## ANOVA
+    tryCatch({
+      aov_model <- aov(Rented.Bike.Count ~ dta[[input$varSelect]], data = dta)
+      anova_summary <- summary(aov_model)
+      p_value <- anova_summary[[1]][["Pr(>F)"]][1]
+      if (p_value <= 0.05) {
+        HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+                   "<strong>La variable ", input$varSelect, " a un impact significatif sur le nombre de vélos loués.</strong>",
+                   '</div>'))
+      } else {
+        HTML(paste("<strong>La variable", input$varSelect, "n'a pas d'impact significatif sur le nombre de vélos loués.</strong>"))}
+    }, error = function(e){
+      HTML("<strong>Impossible de tester la significativité de la variable sélectionnée.</strong>")})
+  })
   
   # Logique pour afficher la blague lorsque le bouton est cliqué
   output$joke_text <- renderText({
