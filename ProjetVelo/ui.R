@@ -1,12 +1,11 @@
 library(shiny)
 library(shinythemes)
-#require(dygraphs)
+library(dygraphs)
 library(DT)
 library(plotly)
 library(tidyverse)
 
 
-#PROBLEMES : le graphique les bornes ne changent pas les graphiques
 
 
 # Define UI for application
