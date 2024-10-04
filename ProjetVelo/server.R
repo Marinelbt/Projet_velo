@@ -124,10 +124,13 @@ function(input, output, session) {
       HTML("<strong>Impossible de tester la significativité de la variable sélectionnée.</strong>")})
   })
   
+  blague <- c("Pourquoi les vélos sont-ils toujours fatigués? Parce qu'ils ont des pneus crevés!",
+  "Quel est le comble pour un cycliste? De perdre les pédales !")
+  
   # Logique pour afficher la blague lorsque le bouton est cliqué
   output$joke_text <- renderText({
     req(input$joke_button)  # Nécessite que le bouton soit cliqué
-    "Pourquoi les vélos sont-ils toujours fatigués? Parce qu'ils ont des pneus crevés!"
+    sample(blague,1)
   })
   #MARINE
   

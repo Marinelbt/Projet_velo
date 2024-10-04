@@ -6,8 +6,6 @@ library(plotly)
 library(tidyverse)
 
 
-
-
 # Define UI for application
 fluidPage(
   #theme = shinytheme("cerulean"),
@@ -22,58 +20,58 @@ fluidPage(
       /* Couleur du texte des onglets et du titre */
       .navbar-default .navbar-nav > li > a, 
       .navbar-default .navbar-brand {
-        color: white !important;  /* Texte en blanc par défaut */
+        color: white !important;  /* Blanc */
       }
       
       /* Couleur de l'onglet au survol */
       .navbar-default .navbar-nav > li > a:hover {
-        background-color: #660000 !important;  /* Rouge foncé au survol */
-        color: white !important;  /* Texte blanc au survol */
+        background-color: #660000 !important;  /* Rouge foncé */
+        color: white !important;  /* Blanc */
       }
       
       /* État de l'onglet actif (sélectionné) */
       .navbar-default .navbar-nav > .active > a {
-        background-color: #660000 !important;  /* Rouge foncé tant que l'onglet est actif */
-        color: white !important;  /* Texte blanc */
+        background-color: #660000 !important;  /* Rouge foncé */
+        color: white !important;  /* Blanc */
       }
 
       /* Garder la couleur de l'onglet actif au survol */
       .navbar-default .navbar-nav > .active > a:hover {
-        background-color: #660000 !important;  /* Garder rouge foncé au survol */
-        color: white !important;  /* Texte blanc */
+        background-color: #660000 !important;  /* Rouge foncé */
+        color: white !important;  /* Blanc */
       }
 
       /* Sous-onglets (dropdown) au survol */
       .navbar-default .navbar-nav .dropdown-menu > li > a:hover {
-        background-color: #660000 !important;  /* Rouge foncé pour les sous-onglets */
-        color: white !important;  /* Texte blanc */
+        background-color: #660000 !important;  /* Rouge foncé */
+        color: white !important;  /* Blanc */
       }
 
       /* Conserver la couleur rouge foncé pour le sous-onglet actif */
       .navbar-default .navbar-nav .dropdown-menu > .active > a {
-        background-color: #660000 !important;  /* Rouge foncé pour le sous-onglet actif */
-        color: white !important;  /* Texte blanc */
+        background-color: #660000 !important;  /* Rouge foncé */
+        color: white !important;  /* Blanc */
       }
 
       /* Pour maintenir l'onglet actif en rouge foncé, même lorsque des sous-onglets sont sélectionnés */
       .navbar-default .navbar-nav .dropdown.open > a {
-        background-color: #660000 !important;  /* Rouge foncé quand le dropdown est ouvert */
-        color: white !important;  /* Texte blanc */
+        background-color: #660000 !important;  /* Rouge foncé */
+        color: white !important;  /* Blanc */
       }
       
       /* Couleur des titres de section */
       h1, h2, h3, h4, h5, h6 {
-        color: #662a2a !important;  /* Rouge foncé pour tous les titres */
+        color: #662a2a !important;  /* Rouge foncé */
       }
       
       /* Couleur des liens hypertexte */
     a {
-      color: #651515  !important;  /* Rouge foncé pour les liens */
+      color: #651515  !important;  /* Rouge foncé */
     }
 
     /* Couleur des liens au survol */
     a:hover {
-      color: #ec5030 !important;  /* Bordeaux clair au survol */
+      color: #ec5030 !important;  /* Bordeaux clair */
     }
     
     
@@ -131,7 +129,7 @@ fluidPage(
   ),
   navbarPage(
     title = div(
-      img(src = "logo.png", height = "40px", style = "margin-top: -10px;")  # Ajuste la hauteur et la position de l'image si nécessaire
+      img(src = "logo.png", height = "40px", style = "margin-top: -10px;")
     ),
     
     # Premier onglet - Présentation
@@ -159,6 +157,7 @@ fluidPage(
                  nécessaires et identifier les facteurs clés qui influencent la 
                  demande de location peut grandement aider à fournir à la ville 
                  une offre stable de vélos."),
+               p(""),
                p("Le jeu de données utilisé pour répondre à cette problématique 
                  est composé de 14 variables : 1 variable réponse (le nombre de 
                  vélos loués), 5 variables qualitatives liées à la temporalité 
@@ -242,37 +241,32 @@ fluidPage(
     tabPanel("Rencontrez notre équipe",
              
              fluidRow(
-               # Carte pour le premier membre de l'équipe
                column(4,  
                       div(
                         class = "card",
-                        style = "padding: 20px; text-align: center;",
+                        style = "padding: 25px; text-align: center;",
                         h3("Timéo Baudat"),
-                        img(src = "tim.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                        img(src = "tim.jpeg", height = "200px", width = "200px", style = "border-radius: 50%;"),
                         p(""),
                         a(href = "https://www.linkedin.com/in/timeo-baudat/", "Profil LinkedIn de Timéo", target = "_blank")
                       )
                ),
-               
-               # Carte pour le deuxième membre de l'équipe
                column(4,  
                       div(
                         class = "card",
-                        style = "padding: 20px; text-align: center;",
+                        style = "padding: 25px; text-align: center;",
                         h3("Élise Lonchampt"),
-                        img(src = "élise.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                        img(src = "élise.jpeg", height = "200px", width = "200px", style = "border-radius: 50%;"),
                         p(""),
                         a(href = "https://www.linkedin.com/in/%C3%A9lise-lonchampt-232705235/", "Profil LinkedIn d'Élise", target = "_blank")
                       )
                ),
-               
-               # Carte pour le troisième membre de l'équipe
                column(4,  
                       div(
                         class = "card",
-                        style = "padding: 20px; text-align: center;",
+                        style = "padding: 25px; text-align: center;",
                         h3("Marine Lebreton"),
-                        img(src = "marine.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                        img(src = "marine.jpeg", height = "200px", width = "200px", style = "border-radius: 50%;"),
                         p(" "),
                         a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn de Marine", target = "_blank")
                       )
