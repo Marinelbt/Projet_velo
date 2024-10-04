@@ -201,10 +201,7 @@ fluidPage(
                tabPanel("Analyse des variables",
                         sidebarLayout(
                           sidebarPanel(
-                            selectInput("varSelect", 
-                                        "Choisir la variable à analyser :",
-                                        choices = setNames(names(df)[-c(1,2,15,16,17,19)],
-                                                           gsub("\\.", " ", names(df)[-c(1,2,15,16,17,19)]))),
+                            uiOutput("varSelectUI"),
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 

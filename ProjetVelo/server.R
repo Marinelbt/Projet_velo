@@ -24,9 +24,13 @@ function(input, output, session) {
   
   #TIM et ELISE
   
-  #Création d'une variable avec la date et heure dans le bon format
+  # Modification du jeu de données
   data_reactive <- reactive({
     df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+    colnames(df) <- c("Date", "Rented.Bike.Count", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
+                      "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
+                      "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
+                      "Jour.de.fonctionnement")
     df$Date <- dmy(df$Date)
     df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
     df$DateHourtemp <- paste(df$Date, df$Hour)
@@ -34,13 +38,24 @@ function(input, output, session) {
     df$Jour <- day(df$Date)
     df$Mois <- month(df$Date)
     df$Année <- year(df$Date)
-    str(df)
-  
-    colnames(df) <- c("Date", "Rented.Bike.Count", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
-                      "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
-                      "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
-                      "Jour.de.fonctionnement", "DateHourTemp", "DateHour", "Jour", "Mois", "Année")
-  
+    df$Jour.de.la.semaine <- wday(df$Date, label = TRUE, abbr = FALSE, week_start = 1, locale = "fr_FR")
+    df$Saisons <- as.character(df$Saisons)
+    df$Jour.de.fonctionnement <- as.character(df$Jour.de.fonctionnement)
+    df$Vacances <- as.character(df$Vacances)
+    df <- df %>%
+      mutate(
+        Saisons = recode(Saisons,
+                         `Spring` = "Printemps",
+                         `Summer` = "Été",
+                         `Autumn` = "Automne",
+                         `Winter` = "Hiver"),
+        Jour.de.fonctionnement = recode(Jour.de.fonctionnement,
+                                        `Yes` = "Oui",
+                                        `No` = "Non"),
+        Vacances = recode(Vacances,
+                          `No Holiday` = "Non",
+                          `Holiday` = "Oui")
+      )
   
     df$Heure <- as.factor(df$Heure)
     df$Jour <- as.factor(df$Jour)
@@ -48,6 +63,9 @@ function(input, output, session) {
     df$Saisons <- as.factor(df$Saisons)
     df$Vacances <- as.factor(df$Vacances)
     df$Jour.de.fonctionnement <- as.factor(df$Jour.de.fonctionnement)
+    df$Jour.de.la.semaine <- as.factor((df$Jour.de.la.semaine))
+    
+    str(df)
     
     return(df)
   })
@@ -55,7 +73,7 @@ function(input, output, session) {
   quant_vars <- c("Température", "Humidité", "Vitesse.du.vent", "Visibilité", 
                     "Température.du.point.de.rosée", "Rayonnement.solaire", 
                     "Précipitations", "Chutes.de.neige")
-  qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour.de.fonctionnement")
+  qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour.de.fonctionnement", "Jour.de.la.semaine")
   
   labels <- c("Température" = "Température (°C)",
               "Humidité" = "Humidité (%)",
@@ -70,7 +88,8 @@ function(input, output, session) {
               "Mois" = "Mois",
               "Saisons" = "Saisons", 
               "Vacances" = "Vacances",
-              "Jour.de.fonctionnement" = "Jour de fonctionnement")
+              "Jour.de.fonctionnement" = "Jour de fonctionnement",
+              "Jour.de.la.semaine" = "Jour de la semaine")
   
   # Encapsulation des données filtrées dans une fonction réactive
   filtered_data <- reactive({
@@ -84,6 +103,15 @@ function(input, output, session) {
     
     # Filtrer les données en fonction de la plage de dates sélectionnée
     subset(df, DateHour >= start_date & DateHour <= end_date)
+  })
+  
+  output$varSelectUI <- renderUI({
+    df <- data_reactive()  # Appel du jeu de données réactif
+    
+    selectInput("varSelect", 
+                "Choisir la variable à analyser :",
+                choices = setNames(names(df)[-c(1,2,15,16,17,19)], 
+                                   gsub("\\.", " ", names(df)[-c(1,2,15,16,17,19)])))
   })
   
   output$linePlot <- renderPlotly({
@@ -174,14 +202,14 @@ function(input, output, session) {
   output$var_quant <- renderUI({
     # Liste des variables quantitatives avec leurs unités et descriptions
     quant_vars <- list(
-      "Temperature..C." = "Température en °C",
-      "Humidity..." = "Humidité en %",
-      "Wind.speed..m.s." = "Vitesse du vent en m/s",
-      "Visibility..10m." = "Visibilité en 10m",
-      "Dew.point.temperature..C." = "Température du point de rosée en °C",
-      "Solar.Radiation..MJ.m2." = "Rayonnement solaire en MJ/m2",
-      "Rainfall.mm." = "Précipitation en mm",
-      "Snowfall..cm." = "Chutes de neige en cm"
+      "Température" = "Température en °C",
+      "Humidité" = "Humidité en %",
+      "Vitesse.du.vent" = "Vitesse du vent en m/s",
+      "Visibilité" = "Visibilité en 10m",
+      "Température.du.point.de.rosée" = "Température du point de rosée en °C",
+      "Rayonnement.solaire" = "Rayonnement solaire en MJ/m2",
+      "Précipitations" = "Précipitation en mm",
+      "Chutes.de.neige" = "Chutes de neige en cm"
     )
     
     HTML(paste(sapply(names(quant_vars), function(var) {
@@ -208,8 +236,9 @@ function(input, output, session) {
   
   #Visualisation du jeu de données 
   output$data_table <- DT::renderDataTable({
+    df <- data_reactive()
     DT::datatable(
-      df[,-(15:16)],  # Votre jeu de données
+      df[,-(15:17)],
       options = list(scrollX = TRUE)  # Activer le défilement horizontal
     )
   })
