@@ -55,7 +55,22 @@ function(input, output, session) {
   quant_vars <- c("Température", "Humidité", "Vitesse.du.vent", "Visibilité", 
                     "Température.du.point.de.rosée", "Rayonnement.solaire", 
                     "Précipitations", "Chutes.de.neige")
-  qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour de fonctionnement")
+  qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour.de.fonctionnement")
+  
+  labels <- c("Température" = "Température (°C)",
+              "Humidité" = "Humidité (%)",
+              "Vitesse.du.vent" = "Vitesse du vent (m/s)",
+              "Visibilité" = "Visibilité (m)",
+              "Température.du.point.de.rosée" = "Température du point de rosée (°C)",
+              "Rayonnement.solaire" = "Rayonnement solaire (MJ/m2)",
+              "Précipitations" = "Précipitations (mm)",
+              "Chutes.de.neige" = "Chutes de neige (cm)",
+              "Heure" = "Heure", 
+              "Jour" = "Jour",
+              "Mois" = "Mois",
+              "Saisons" = "Saisons", 
+              "Vacances" = "Vacances",
+              "Jour.de.fonctionnement" = "Jour de fonctionnement")
   
   # Encapsulation des données filtrées dans une fonction réactive
   filtered_data <- reactive({
@@ -64,6 +79,9 @@ function(input, output, session) {
     start_date <- as.POSIXct(input$dates[1])
     end_date <- as.POSIXct(input$dates[2])
     
+    # Récupération de df
+    df <- data_reactive()
+    
     # Filtrer les données en fonction de la plage de dates sélectionnée
     subset(df, DateHour >= start_date & DateHour <= end_date)
   })
@@ -71,7 +89,7 @@ function(input, output, session) {
   output$linePlot <- renderPlotly({
     dta <- filtered_data()
     
-    if (length(input$varSelect) == 1 && input$varSelect %in% quant_vars) {
+    if (input$varSelect %in% quant_vars) {
       
       plot_ly(dta, 
               x = ~DateHour, 
@@ -87,22 +105,22 @@ function(input, output, session) {
                   mode = 'lines', 
                   text = ~paste("Date:", DateHour, "<br>Valeur:", dta[[input$varSelect]]),
                   hoverinfo = 'text', 
-                  name = input$varSelect, 
+                  name = labels[input$varSelect], 
                   yaxis = "y2",
                   line = list(color='green'))  %>% 
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
                yaxis = list(title = "Vélos loués"),
-               yaxis2 = list(title = input$varSelect, overlaying = "y", side = "right"),
+               yaxis2 = list(title = labels[input$varSelect], overlaying = "y", side = "right"),
                xaxis = list(title = "Date et Heure"),
                hovermode = "closest")  # Définir le mode de survol
       
-    } else if (length(input$varSelect) == 1 && input$varSelect %in% qual_vars) {
+    } else if (input$varSelect %in% qual_vars) {
       plot_ly(dta, 
               x = ~dta[[input$varSelect]], 
               y = ~Rented.Bike.Count, 
               type = 'box') %>%
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
-               xaxis = list(title = input$varSelect, overlaying = "y", side = "right"),
+               xaxis = list(title = labels[input$varSelect], overlaying = "y", side = "right"),
                yaxis = list(title = "Vélos loués"))
     } 
   })
@@ -119,10 +137,10 @@ function(input, output, session) {
       p_value <- anova_summary[[1]][["Pr(>F)"]][1]
       if (p_value <= 0.05) {
         HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
-                   "<strong>La variable ", input$varSelect, " a un impact significatif sur le nombre de vélos loués.</strong>",
+                   "<strong>La variable ", labels[input$varSelect], " a un impact significatif sur le nombre de vélos loués.</strong>",
                    '</div>'))
       } else {
-        HTML(paste("<strong>La variable", input$varSelect, "n'a pas d'impact significatif sur le nombre de vélos loués.</strong>"))}
+        HTML(paste("<strong>La variable", labels[input$varSelect], "n'a pas d'impact significatif sur le nombre de vélos loués.</strong>"))}
     }, error = function(e){
       HTML("<strong>Impossible de tester la significativité de la variable sélectionnée.</strong>")})
   })
