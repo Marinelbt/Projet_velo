@@ -68,7 +68,7 @@ fluidPage(
       
       /* Couleur des liens hypertexte */
     a {
-      color: #651515q  !important;  /* Rouge foncé pour les liens */
+      color: #651515  !important;  /* Rouge foncé pour les liens */
     }
 
     /* Couleur des liens au survol */
