@@ -25,33 +25,36 @@ function(input, output, session) {
   #TIM et ELISE
   
   #Création d'une variable avec la date et heure dans le bon format
-  df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
-  df$Date <- dmy(df$Date)
-  df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
-  df$DateHourtemp <- paste(df$Date, df$Hour)
-  df$DateHour <- ymd_hm(df$DateHourtemp)
-  df$Jour <- day(df$Date)
-  df$Mois <- month(df$Date)
-  df$Année <- year(df$Date)
-  str(df)
+  data_reactive <- reactive({
+    df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+    df$Date <- dmy(df$Date)
+    df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
+    df$DateHourtemp <- paste(df$Date, df$Hour)
+    df$DateHour <- ymd_hm(df$DateHourtemp)
+    df$Jour <- day(df$Date)
+    df$Mois <- month(df$Date)
+    df$Année <- year(df$Date)
+    str(df)
   
-  colnames(df) <- c("Date", "Rented.Bike.Count", "Heure", "Température",
-                    "Humidité", "Vitesse du vent", "Visibilité", 
-                    "Température du point de rosée",
-                    "Rayonnement solaire", "Précipitations", "Chutes de neige", "Saisons",
-                    "Vacances", "Jour de fonctionnement", "DateHourTemp", "DateHour", "Jour",
-                    "Mois","Année")
+    colnames(df) <- c("Date", "Rented.Bike.Count", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
+                      "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
+                      "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
+                      "Jour.de.fonctionnement", "DateHourTemp", "DateHour", "Jour", "Mois", "Année")
   
-  df$Heure <- as.factor(df$Heure)
-  df$Jour <- as.factor(df$Jour)
-  df$Mois <- as.factor(df$Mois)
-  df$Saisons <- as.factor(df$Saisons)
-  df$Vacances <- as.factor(df$Vacances)
-  df$`Jour de fonctionnement` <- as.factor(df$`Jour de fonctionnement`)
   
-  quant_vars <- c("Température", "Humidité", "Vitesse du vent", "Visibilité",
-                  "Température du point de rosée", "Rayonnement solaire", 
-                  "Précipitations", "Chutes de neige")
+    df$Heure <- as.factor(df$Heure)
+    df$Jour <- as.factor(df$Jour)
+    df$Mois <- as.factor(df$Mois)
+    df$Saisons <- as.factor(df$Saisons)
+    df$Vacances <- as.factor(df$Vacances)
+    df$Jour.de.fonctionnement <- as.factor(df$Jour.de.fonctionnement)
+    
+    return(df)
+  })
+  
+  quant_vars <- c("Température", "Humidité", "Vitesse.du.vent", "Visibilité", 
+                    "Température.du.point.de.rosée", "Rayonnement.solaire", 
+                    "Précipitations", "Chutes.de.neige")
   qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour de fonctionnement")
   
   # Encapsulation des données filtrées dans une fonction réactive
@@ -68,7 +71,7 @@ function(input, output, session) {
   output$linePlot <- renderPlotly({
     dta <- filtered_data()
     
-    if (input$varSelect %in% quant_vars) {
+    if (length(input$varSelect) == 1 && input$varSelect %in% quant_vars) {
       
       plot_ly(dta, 
               x = ~DateHour, 
@@ -93,7 +96,7 @@ function(input, output, session) {
                xaxis = list(title = "Date et Heure"),
                hovermode = "closest")  # Définir le mode de survol
       
-    } else if (input$varSelect %in% qual_vars) {
+    } else if (length(input$varSelect) == 1 && input$varSelect %in% qual_vars) {
       plot_ly(dta, 
               x = ~dta[[input$varSelect]], 
               y = ~Rented.Bike.Count, 

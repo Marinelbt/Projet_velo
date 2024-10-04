@@ -169,7 +169,7 @@ fluidPage(
         column(4,  # 4 sur 12 colonnes pour l'image
                img(src = "photo.jpg", style = "max-width: 100%; height: auto; margin-top: 50px;")
         )
-      ),
+      )
 ),
     
     navbarMenu(title = "Description des données",
@@ -198,12 +198,13 @@ fluidPage(
                           )
                         )
                ),
-               tabPanel("Graphique",
+               tabPanel("Analyse des variables",
                         sidebarLayout(
                           sidebarPanel(
                             selectInput("varSelect", 
                                         "Choisir la variable à analyser :",
-                                        choices = names(df)[-c(1,2,15,16,19)]), 
+                                        choices = setNames(names(df)[-c(1,2,15,16,17,19)],
+                                                           gsub("\\.", " ", names(df)[-c(1,2,15,16,17,19)]))),
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
@@ -217,7 +218,7 @@ fluidPage(
                           mainPanel(
                             plotlyOutput("linePlot")  # Graphique
                           )
-                        )),
+                        ))
     ),
     
     tabPanel(title = "Prediction",
