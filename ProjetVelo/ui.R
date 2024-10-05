@@ -202,6 +202,12 @@ fluidPage(
                         sidebarLayout(
                           sidebarPanel(
                             uiOutput("varSelectUI"),
+                            conditionalPanel(
+                              condition = "input.varSelect == 'Heure'",
+                              selectInput("typeJour",
+                                          "Choisir les jours à afficher :",
+                                          choices = c("Semaine" = "Semaine","Week-end" = "Week-end","Semaine et week-end" = "Semaine et week-end"),
+                                          selected = "Semaine et week-end")),
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
@@ -210,7 +216,7 @@ fluidPage(
                                            max = "2018-11-30",
                                            format = "yyyy-mm-dd"), # Choix des dates
                             uiOutput("anova_result") # Affichage du résultat de l'ANOVA
-                          ),
+                            ),
                           
                           mainPanel(
                             plotlyOutput("linePlot")  # Graphique

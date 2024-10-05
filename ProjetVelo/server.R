@@ -32,7 +32,7 @@ function(input, output, session) {
                       "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
                       "Jour.de.fonctionnement")
     df$Date <- dmy(df$Date)
-    df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
+    df$Hour <- paste0(sprintf("%02d", df$Heure), ":00")
     df$DateHourtemp <- paste(df$Date, df$Hour)
     df$DateHour <- ymd_hm(df$DateHourtemp)
     df$Jour <- day(df$Date)
@@ -54,8 +54,7 @@ function(input, output, session) {
                                         `No` = "Non"),
         Vacances = recode(Vacances,
                           `No Holiday` = "Non",
-                          `Holiday` = "Oui")
-      )
+                          `Holiday` = "Oui"))
   
     df$Heure <- as.factor(df$Heure)
     df$Jour <- as.factor(df$Jour)
@@ -101,8 +100,17 @@ function(input, output, session) {
     # Récupération de df
     df <- data_reactive()
     
-    # Filtrer les données en fonction de la plage de dates sélectionnée
-    subset(df, DateHour >= start_date & DateHour <= end_date)
+    # Filtrage des données en fonction de la plage de dates sélectionnée
+    df <- subset(df, DateHour >= start_date & DateHour <= end_date)
+    
+    # Filtrage supplémentaire si choix de la variable "Heure"
+    if (input$varSelect == "Heure"){
+      if (input$typeJour == "Week-end"){
+        df <- df %>% filter(Jour.de.la.semaine %in% c("Samedi", "Dimanche"))}
+      else if (input$typeJour == "Semaine"){
+        df <- df %>% filter(Jour.de.la.semaine %in% c("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"))}
+    }
+    return(df)
   })
   
   output$varSelectUI <- renderUI({
@@ -110,8 +118,8 @@ function(input, output, session) {
     
     selectInput("varSelect", 
                 "Choisir la variable à analyser :",
-                choices = setNames(names(df)[-c(1,2,15,16,17,19)], 
-                                   gsub("\\.", " ", names(df)[-c(1,2,15,16,17,19)])))
+                choices = setNames(names(df)[-c(1,2,15,16,17,18,20)], 
+                                   gsub("\\.", " ", names(df)[-c(1,2,15,16,17,18,20)])))
   })
   
   output$linePlot <- renderPlotly({
