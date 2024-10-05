@@ -143,7 +143,7 @@ function(input, output, session) {
                   hoverinfo = 'text', 
                   name = labels[input$varSelect], 
                   yaxis = "y2",
-                  line = list(color='green'))  %>% 
+                  line = list(color='#1ABC9C'))  %>% 
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
                yaxis = list(title = "Vélos loués"),
                yaxis2 = list(title = labels[input$varSelect], overlaying = "y", side = "right"),
@@ -170,15 +170,15 @@ function(input, output, session) {
       anova_summary <- summary(aov_model)
       p_value <- anova_summary[[1]][["Pr(>F)"]][1]
       if (p_value <= 0.05) {
-        HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+        HTML(paste('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
                    "La variable ", labels[input$varSelect], " a un <strong> impact significatif </strong> sur le nombre de vélos loués.",
                    '</div>'))
       } else {
-        HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+        HTML(paste('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
                    "La variable", labels[input$varSelect], "n'a <strong> pas d'impact significatif </strong> sur le nombre de vélos loués.",
                    '</div>'))}
     }, error = function(e){
-      HTML('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+      HTML('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
            "Impossible de tester la significativité de la variable sélectionnée.",
            '</div>')})
   })
@@ -188,7 +188,7 @@ function(input, output, session) {
     dta <- filtered_data()
     if (input$varSelect %in% quant_vars){
       correlation_value <- cor(dta$Rented.Bike.Count, dta[[input$varSelect]], use = "complete.obs")
-      HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+      HTML(paste('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
                  "Le coefficient de corrélation entre",labels[input$varSelect],"et le nombre de vélos loués est :", '<strong>',sprintf("%.2f", correlation_value), '</strong>',
                  '</div>'))}
   })
@@ -206,6 +206,7 @@ function(input, output, session) {
   
   # Calcul du nombre de lignes
   output$nb_lignes <- renderText({
+    df <- data_reactive()
     nrow(df)
   })
   
