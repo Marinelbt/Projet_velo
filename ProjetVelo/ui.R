@@ -215,8 +215,8 @@ fluidPage(
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
                                            format = "yyyy-mm-dd"), # Choix des dates
-                            uiOutput("anova_result") # Affichage du résultat de l'ANOVA
-                            ),
+                            div(uiOutput("anova_result"), style = "margin-bottom: 20px;"), # Affichage du résultat de l'ANOVA
+                            div(uiOutput("correlation"))), # Affichage du coeff de corrélation si quanti
                           
                           mainPanel(
                             plotlyOutput("linePlot")  # Graphique

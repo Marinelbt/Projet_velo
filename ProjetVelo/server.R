@@ -161,29 +161,39 @@ function(input, output, session) {
     } 
   })
   
-  # Info sur variable
+  # ANOVA
   output$anova_result <- renderUI({
     dta <- filtered_data()
-    result_text <- ""
-    
-    ## ANOVA
+
     tryCatch({
       aov_model <- aov(Rented.Bike.Count ~ dta[[input$varSelect]], data = dta)
       anova_summary <- summary(aov_model)
       p_value <- anova_summary[[1]][["Pr(>F)"]][1]
       if (p_value <= 0.05) {
         HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
-                   "<strong>La variable ", labels[input$varSelect], " a un impact significatif sur le nombre de vélos loués.</strong>",
+                   "La variable ", labels[input$varSelect], " a un <strong> impact significatif </strong> sur le nombre de vélos loués.",
                    '</div>'))
       } else {
         HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
-                   "<strong>La variable", labels[input$varSelect], "n'a pas d'impact significatif sur le nombre de vélos loués.</strong>",
+                   "La variable", labels[input$varSelect], "n'a <strong> pas d'impact significatif </strong> sur le nombre de vélos loués.",
                    '</div>'))}
     }, error = function(e){
       HTML('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
-           "<strong>Impossible de tester la significativité de la variable sélectionnée.</strong>",
+           "Impossible de tester la significativité de la variable sélectionnée.",
            '</div>')})
   })
+  
+  ## Coefficient de corrélation
+  output$correlation <- renderUI({
+    dta <- filtered_data()
+    if (input$varSelect %in% quant_vars){
+      correlation_value <- cor(dta$Rented.Bike.Count, dta[[input$varSelect]], use = "complete.obs")
+      HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+                 "Le coefficient de corrélation entre",labels[input$varSelect],"et le nombre de vélos loués est :", '<strong>',sprintf("%.2f", correlation_value), '</strong>',
+                 '</div>'))}
+  })
+    
+      
   
   # Logique pour afficher la blague lorsque le bouton est cliqué
   output$joke_text <- renderText({
