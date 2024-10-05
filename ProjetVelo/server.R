@@ -176,9 +176,13 @@ function(input, output, session) {
                    "<strong>La variable ", labels[input$varSelect], " a un impact significatif sur le nombre de vélos loués.</strong>",
                    '</div>'))
       } else {
-        HTML(paste("<strong>La variable", labels[input$varSelect], "n'a pas d'impact significatif sur le nombre de vélos loués.</strong>"))}
+        HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+                   "<strong>La variable", labels[input$varSelect], "n'a pas d'impact significatif sur le nombre de vélos loués.</strong>",
+                   '</div>'))}
     }, error = function(e){
-      HTML("<strong>Impossible de tester la significativité de la variable sélectionnée.</strong>")})
+      HTML('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
+           "<strong>Impossible de tester la significativité de la variable sélectionnée.</strong>",
+           '</div>')})
   })
   
   # Logique pour afficher la blague lorsque le bouton est cliqué
