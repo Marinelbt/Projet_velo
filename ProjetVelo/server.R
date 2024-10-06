@@ -24,38 +24,71 @@ function(input, output, session) {
   
   #TIM et ELISE
   
-  #Création d'une variable avec la date et heure dans le bon format
+  # Modification du jeu de données
   data_reactive <- reactive({
     df <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+    colnames(df) <- c("Date", "Rented.Bike.Count", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
+                      "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
+                      "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
+                      "Jour.de.fonctionnement")
     df$Date <- dmy(df$Date)
-    df$Hour <- paste0(sprintf("%02d", df$Hour), ":00")
+    df$Hour <- paste0(sprintf("%02d", df$Heure), ":00")
     df$DateHourtemp <- paste(df$Date, df$Hour)
     df$DateHour <- ymd_hm(df$DateHourtemp)
     df$Jour <- day(df$Date)
     df$Mois <- month(df$Date)
     df$Année <- year(df$Date)
-    str(df)
-  
-    colnames(df) <- c("Date", "Rented.Bike.Count", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
-                      "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
-                      "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
-                      "Jour.de.fonctionnement", "DateHourTemp", "DateHour", "Jour", "Mois", "Année")
-  
-  
+    df$Jour.de.la.semaine <- wday(df$Date, label = TRUE, abbr = FALSE, week_start = 1, locale = "fr_FR")
+    df$Saisons <- as.character(df$Saisons)
+    df$Jour.de.fonctionnement <- as.character(df$Jour.de.fonctionnement)
+    df$Vacances <- as.character(df$Vacances)
+    df <- df %>%
+      mutate(
+        Saisons = recode(Saisons,
+                         `Spring` = "Printemps",
+                         `Summer` = "Été",
+                         `Autumn` = "Automne",
+                         `Winter` = "Hiver"),
+        Jour.de.fonctionnement = recode(Jour.de.fonctionnement,
+                                        `Yes` = "Oui",
+                                        `No` = "Non"),
+        Vacances = recode(Vacances,
+                          `No Holiday` = "Non",
+                          `Holiday` = "Oui"))
+    
     df$Heure <- as.factor(df$Heure)
     df$Jour <- as.factor(df$Jour)
     df$Mois <- as.factor(df$Mois)
     df$Saisons <- as.factor(df$Saisons)
     df$Vacances <- as.factor(df$Vacances)
     df$Jour.de.fonctionnement <- as.factor(df$Jour.de.fonctionnement)
+    df$Jour.de.la.semaine <- as.factor((df$Jour.de.la.semaine))
+    
+    str(df)
     
     return(df)
   })
   
   quant_vars <- c("Température", "Humidité", "Vitesse.du.vent", "Visibilité", 
-                    "Température.du.point.de.rosée", "Rayonnement.solaire", 
-                    "Précipitations", "Chutes.de.neige")
-  qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour de fonctionnement")
+                  "Température.du.point.de.rosée", "Rayonnement.solaire", 
+                  "Précipitations", "Chutes.de.neige")
+  qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour.de.fonctionnement", "Jour.de.la.semaine")
+  
+  labels <- c("Température" = "Température (°C)",
+              "Humidité" = "Humidité (%)",
+              "Vitesse.du.vent" = "Vitesse du vent (m/s)",
+              "Visibilité" = "Visibilité (m)",
+              "Température.du.point.de.rosée" = "Température du point de rosée (°C)",
+              "Rayonnement.solaire" = "Rayonnement solaire (MJ/m2)",
+              "Précipitations" = "Précipitations (mm)",
+              "Chutes.de.neige" = "Chutes de neige (cm)",
+              "Heure" = "Heure", 
+              "Jour" = "Jour",
+              "Mois" = "Mois",
+              "Saisons" = "Saisons", 
+              "Vacances" = "Vacances",
+              "Jour.de.fonctionnement" = "Jour de fonctionnement",
+              "Jour.de.la.semaine" = "Jour de la semaine")
   
   # Encapsulation des données filtrées dans une fonction réactive
   filtered_data <- reactive({
@@ -64,14 +97,35 @@ function(input, output, session) {
     start_date <- as.POSIXct(input$dates[1])
     end_date <- as.POSIXct(input$dates[2])
     
-    # Filtrer les données en fonction de la plage de dates sélectionnée
-    subset(df, DateHour >= start_date & DateHour <= end_date)
+    # Récupération de df
+    df <- data_reactive()
+    
+    # Filtrage des données en fonction de la plage de dates sélectionnée
+    df <- subset(df, DateHour >= start_date & DateHour <= end_date)
+    
+    # Filtrage supplémentaire si choix de la variable "Heure"
+    if (input$varSelect == "Heure"){
+      if (input$typeJour == "Week-end"){
+        df <- df %>% filter(Jour.de.la.semaine %in% c("Samedi", "Dimanche"))}
+      else if (input$typeJour == "Semaine"){
+        df <- df %>% filter(Jour.de.la.semaine %in% c("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"))}
+    }
+    return(df)
+  })
+  
+  output$varSelectUI <- renderUI({
+    df <- data_reactive()  # Appel du jeu de données réactif
+    
+    selectInput("varSelect", 
+                "Choisir la variable à analyser :",
+                choices = setNames(names(df)[-c(1,2,15,16,17,18,20)], 
+                                   gsub("\\.", " ", names(df)[-c(1,2,15,16,17,18,20)])))
   })
   
   output$linePlot <- renderPlotly({
     dta <- filtered_data()
     
-    if (length(input$varSelect) == 1 && input$varSelect %in% quant_vars) {
+    if (input$varSelect %in% quant_vars) {
       
       plot_ly(dta, 
               x = ~DateHour, 
@@ -87,45 +141,59 @@ function(input, output, session) {
                   mode = 'lines', 
                   text = ~paste("Date:", DateHour, "<br>Valeur:", dta[[input$varSelect]]),
                   hoverinfo = 'text', 
-                  name = input$varSelect, 
+                  name = labels[input$varSelect], 
                   yaxis = "y2",
-                  line = list(color='green'))  %>% 
+                  line = list(color='#1ABC9C'))  %>% 
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
                yaxis = list(title = "Vélos loués"),
-               yaxis2 = list(title = input$varSelect, overlaying = "y", side = "right"),
+               yaxis2 = list(title = labels[input$varSelect], overlaying = "y", side = "right"),
                xaxis = list(title = "Date et Heure"),
                hovermode = "closest")  # Définir le mode de survol
       
-    } else if (length(input$varSelect) == 1 && input$varSelect %in% qual_vars) {
+    } else if (input$varSelect %in% qual_vars) {
       plot_ly(dta, 
               x = ~dta[[input$varSelect]], 
               y = ~Rented.Bike.Count, 
               type = 'box') %>%
         layout(title = "Quantité de vélos loués dans la ville de Séoul",
-               xaxis = list(title = input$varSelect, overlaying = "y", side = "right"),
+               xaxis = list(title = labels[input$varSelect], overlaying = "y", side = "right"),
                yaxis = list(title = "Vélos loués"))
     } 
   })
   
-  # Info sur variable
+  # ANOVA
   output$anova_result <- renderUI({
     dta <- filtered_data()
-    result_text <- ""
     
-    ## ANOVA
     tryCatch({
       aov_model <- aov(Rented.Bike.Count ~ dta[[input$varSelect]], data = dta)
       anova_summary <- summary(aov_model)
       p_value <- anova_summary[[1]][["Pr(>F)"]][1]
       if (p_value <= 0.05) {
-        HTML(paste('<div style="border: 2px solid #660000; padding: 10px; border-radius: 5px;">',
-                   "<strong>La variable ", input$varSelect, " a un impact significatif sur le nombre de vélos loués.</strong>",
+        HTML(paste('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
+                   "La variable ", labels[input$varSelect], " a un <strong> impact significatif </strong> sur le nombre de vélos loués.",
                    '</div>'))
       } else {
-        HTML(paste("<strong>La variable", input$varSelect, "n'a pas d'impact significatif sur le nombre de vélos loués.</strong>"))}
+        HTML(paste('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
+                   "La variable", labels[input$varSelect], "n'a <strong> pas d'impact significatif </strong> sur le nombre de vélos loués.",
+                   '</div>'))}
     }, error = function(e){
-      HTML("<strong>Impossible de tester la significativité de la variable sélectionnée.</strong>")})
+      HTML('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
+           "Impossible de tester la significativité de la variable sélectionnée.",
+           '</div>')})
   })
+  
+  ## Coefficient de corrélation
+  output$correlation <- renderUI({
+    dta <- filtered_data()
+    if (input$varSelect %in% quant_vars){
+      correlation_value <- cor(dta$Rented.Bike.Count, dta[[input$varSelect]], use = "complete.obs")
+      HTML(paste('<div style="border: 2px solid #1ABC9C; padding: 10px; border-radius: 5px;">',
+                 "Le coefficient de corrélation entre",labels[input$varSelect],"et le nombre de vélos loués est :", '<strong>',sprintf("%.2f", correlation_value), '</strong>',
+                 '</div>'))}
+  })
+  
+  
   
   # Logique pour afficher la blague lorsque le bouton est cliqué
   output$joke_text <- renderText({
@@ -138,6 +206,7 @@ function(input, output, session) {
   
   # Calcul du nombre de lignes
   output$nb_lignes <- renderText({
+    df <- data_reactive()
     nrow(df)
   })
   
@@ -156,14 +225,14 @@ function(input, output, session) {
   output$var_quant <- renderUI({
     # Liste des variables quantitatives avec leurs unités et descriptions
     quant_vars <- list(
-      "Temperature..C." = "Température en °C",
-      "Humidity..." = "Humidité en %",
-      "Wind.speed..m.s." = "Vitesse du vent en m/s",
-      "Visibility..10m." = "Visibilité en 10m",
-      "Dew.point.temperature..C." = "Température du point de rosée en °C",
-      "Solar.Radiation..MJ.m2." = "Rayonnement solaire en MJ/m2",
-      "Rainfall.mm." = "Précipitation en mm",
-      "Snowfall..cm." = "Chutes de neige en cm"
+      "Température" = "Température en °C",
+      "Humidité" = "Humidité en %",
+      "Vitesse.du.vent" = "Vitesse du vent en m/s",
+      "Visibilité" = "Visibilité en 10m",
+      "Température.du.point.de.rosée" = "Température du point de rosée en °C",
+      "Rayonnement.solaire" = "Rayonnement solaire en MJ/m2",
+      "Précipitations" = "Précipitation en mm",
+      "Chutes.de.neige" = "Chutes de neige en cm"
     )
     
     HTML(paste(sapply(names(quant_vars), function(var) {
@@ -190,8 +259,9 @@ function(input, output, session) {
   
   #Visualisation du jeu de données 
   output$data_table <- DT::renderDataTable({
+    df <- data_reactive()
     DT::datatable(
-      df[,-(15:16)],  # Votre jeu de données
+      df[,-(15:17)],
       options = list(scrollX = TRUE)  # Activer le défilement horizontal
     )
   })
@@ -272,6 +342,6 @@ function(input, output, session) {
   })
   
   
-
+  
   
 }

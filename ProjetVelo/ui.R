@@ -5,18 +5,16 @@ library(DT)
 library(plotly)
 library(tidyverse)
 
-
-
-
 # Define UI for application
 fluidPage(
-  #theme = shinytheme("cerulean"),
+  theme = shinytheme("flatly"),  # Thème sobre sélectionné
+  
   # Ajout de styles personnalisés via CSS
   tags$head(
     tags$style(HTML("
       /* Couleur du bandeau */
       .navbar {
-        background-color: #ec5030 !important;  /* Bordeaux clair */
+        background-color: #2C3E50 !important;  /* Bleu sombre */
       }
       
       /* Couleur du texte des onglets et du titre */
@@ -27,60 +25,52 @@ fluidPage(
       
       /* Couleur de l'onglet au survol */
       .navbar-default .navbar-nav > li > a:hover {
-        background-color: #660000 !important;  /* Rouge foncé au survol */
+        background-color: #34495E !important;  /* Gris foncé au survol */
         color: white !important;  /* Texte blanc au survol */
       }
       
       /* État de l'onglet actif (sélectionné) */
       .navbar-default .navbar-nav > .active > a {
-        background-color: #660000 !important;  /* Rouge foncé tant que l'onglet est actif */
+        background-color: #34495E !important;  /* Gris foncé tant que l'onglet est actif */
         color: white !important;  /* Texte blanc */
       }
 
       /* Garder la couleur de l'onglet actif au survol */
       .navbar-default .navbar-nav > .active > a:hover {
-        background-color: #660000 !important;  /* Garder rouge foncé au survol */
+        background-color: #34495E !important;  /* Garder gris foncé au survol */
         color: white !important;  /* Texte blanc */
       }
 
-      /* Sous-onglets (dropdown) au survol */
+      /* Couleur des sous-onglets (dropdown) */
       .navbar-default .navbar-nav .dropdown-menu > li > a:hover {
-        background-color: #660000 !important;  /* Rouge foncé pour les sous-onglets */
+        background-color: #34495E !important;  /* Gris foncé pour les sous-onglets */
         color: white !important;  /* Texte blanc */
       }
-
-      /* Conserver la couleur rouge foncé pour le sous-onglet actif */
+      
+      /* Conserver la couleur grise pour le sous-onglet actif */
       .navbar-default .navbar-nav .dropdown-menu > .active > a {
-        background-color: #660000 !important;  /* Rouge foncé pour le sous-onglet actif */
+        background-color: #34495E !important;  /* Gris foncé pour le sous-onglet actif */
         color: white !important;  /* Texte blanc */
       }
 
-      /* Pour maintenir l'onglet actif en rouge foncé, même lorsque des sous-onglets sont sélectionnés */
-      .navbar-default .navbar-nav .dropdown.open > a {
-        background-color: #660000 !important;  /* Rouge foncé quand le dropdown est ouvert */
-        color: white !important;  /* Texte blanc */
-      }
-      
-      /* Couleur des titres de section */
+      /* Titre des sections */
       h1, h2, h3, h4, h5, h6 {
-        color: #662a2a !important;  /* Rouge foncé pour tous les titres */
+        color: #2C3E50 !important;  /* Bleu sombre */
       }
       
-      /* Couleur des liens hypertexte */
-    a {
-      color: #651515q  !important;  /* Rouge foncé pour les liens */
-    }
+      /* Couleur des liens */
+      a {
+        color: #1ABC9C !important;  /* Vert menthe pour les liens */
+      }
 
-    /* Couleur des liens au survol */
-    a:hover {
-      color: #ec5030 !important;  /* Bordeaux clair au survol */
-    }
+      /* Couleur des liens au survol */
+      a:hover {
+        color: #16A085 !important;  /* Vert foncé au survol */
+      }
     
-    
-    
-    /* Style du bouton principal */
+      /* Style du bouton principal */
       .stylish-button {
-        background-color: #660000; /* Rouge foncé */
+        background-color: #2C3E50; /* Bleu sombre */
         color: white; /* Texte en blanc */
         border: none; /* Pas de bordure */
         border-radius: 5px; /* Coins arrondis */
@@ -90,48 +80,33 @@ fluidPage(
         transition: background-color 0.3s; /* Animation douce */
       }
 
-      /* Changer le style au survol */
+      /* Style du bouton au survol */
       .stylish-button:hover {
-        background-color: #ec5030; /* Bordeaux clair au survol */
+        background-color: #34495E; /* Gris foncé au survol */
       }
 
-      /* Style du bouton pour la blague */
+      /* Style pour le bouton de blague */
       .small-button {
-        background-color: #660000; /* Rouge foncé */
-        color: white; /* Texte en blanc */
+        background-color: #2C3E50; /* Bleu sombre */
+        color: white; /* Texte blanc */
         border: none; /* Pas de bordure */
         border-radius: 5px; /* Coins arrondis */
-        padding: 5px 10px; /* Espacement interne réduit pour un bouton plus petit */
-        font-size: 12px; /* Taille de police réduite */
-        cursor: pointer; /* Changer le curseur au survol */
+        padding: 5px 10px; /* Espacement interne réduit */
+        font-size: 12px; /* Petite police */
+        cursor: pointer; /* Changer le curseur */
         transition: background-color 0.3s; /* Animation douce */
       }
 
-      /* Changer le style au survol */
       .small-button:hover {
-        background-color: #ec5030; /* Bordeaux clair au survol */
+        background-color: #34495E; /* Gris foncé au survol */
       }
-
-      /* Positionner le conteneur de boutons en bas à gauche */
-      .button-container {
-        position: fixed; /* Positionnement fixe */
-        bottom: 20px; /* 20 pixels du bas */
-        left: 20px; /* 20 pixels de gauche */
-        z-index: 1000; /* S'assurer que le conteneur est au-dessus des autres éléments */
-      }
-
-      /* Style pour le texte de la blague */
-      .joke-text {
-        margin-left: 10px; /* Espacement à gauche du texte de la blague */
-        color: #660000; /* Couleur du texte de la blague */
-        font-size: 14px; /* Taille de police pour le texte de la blague */
-      }
-    
     "))
   ),
+  
   navbarPage(
     title = div(
-      img(src = "logo.png", height = "40px", style = "margin-top: -10px;")  # Ajuste la hauteur et la position de l'image si nécessaire
+      style = "display: flex; justify-content: center; align-items: center; height: 60px; width: 100%;",
+      img(src = "seoul_bike.png", height = "60px", style = "margin-top: -40px;")
     ),
     
     # Premier onglet - Présentation
@@ -139,8 +114,7 @@ fluidPage(
       title = "Introduction",
       
       fluidRow(
-        # Colonne de gauche pour le texte
-        column(8,  # 8 sur 12 colonnes pour le texte
+        column(8,
                h2("Contexte"),
                p("Face à la congestion routière et à la pollution croissante, 
                  de nombreuses métropoles investissent dans des moyens de 
@@ -170,7 +144,7 @@ fluidPage(
                img(src = "photo.jpg", style = "max-width: 100%; height: auto; margin-top: 50px;")
         )
       )
-),
+    ),
     
     navbarMenu(title = "Description des données",
                tabPanel("Jeu de données",
@@ -201,10 +175,13 @@ fluidPage(
                tabPanel("Analyse des variables",
                         sidebarLayout(
                           sidebarPanel(
-                            selectInput("varSelect", 
-                                        "Choisir la variable à analyser :",
-                                        choices = setNames(names(df)[-c(1,2,15,16,17,19)],
-                                                           gsub("\\.", " ", names(df)[-c(1,2,15,16,17,19)]))),
+                            uiOutput("varSelectUI"),
+                            conditionalPanel(
+                              condition = "input.varSelect == 'Heure'",
+                              selectInput("typeJour",
+                                          "Choisir les jours à afficher :",
+                                          choices = c("Semaine" = "Semaine","Week-end" = "Week-end","Semaine et week-end" = "Semaine et week-end"),
+                                          selected = "Semaine et week-end")),
                             dateRangeInput("dates", 
                                            "Sélectionner l'intervalle de dates (entre 2017-12-01 et 2018-11-30):", 
                                            start = "2017-12-01", 
@@ -212,8 +189,8 @@ fluidPage(
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
                                            format = "yyyy-mm-dd"), # Choix des dates
-                            uiOutput("anova_result") # Affichage du résultat de l'ANOVA
-                          ),
+                            div(uiOutput("anova_result"), style = "margin-bottom: 20px;"), # Affichage du résultat de l'ANOVA
+                            div(uiOutput("correlation"))), # Affichage du coeff de corrélation si quanti
                           
                           mainPanel(
                             plotlyOutput("linePlot")  # Graphique
@@ -243,7 +220,6 @@ fluidPage(
     tabPanel("Rencontrez notre équipe",
              
              fluidRow(
-               # Carte pour le premier membre de l'équipe
                column(4,  
                       div(
                         class = "card",
@@ -254,8 +230,6 @@ fluidPage(
                         a(href = "https://www.linkedin.com/in/timeo-baudat/", "Profil LinkedIn de Timéo", target = "_blank")
                       )
                ),
-               
-               # Carte pour le deuxième membre de l'équipe
                column(4,  
                       div(
                         class = "card",
@@ -266,8 +240,6 @@ fluidPage(
                         a(href = "https://www.linkedin.com/in/%C3%A9lise-lonchampt-232705235/", "Profil LinkedIn d'Élise", target = "_blank")
                       )
                ),
-               
-               # Carte pour le troisième membre de l'équipe
                column(4,  
                       div(
                         class = "card",
@@ -281,11 +253,11 @@ fluidPage(
              ),
              tags$div(class = "button-container",
                       actionButton("joke_button", "Raconter une blague sur le vélo", class = "small-button"),
-                      textOutput("joke_text", container = span, inline = TRUE)  # Affiche la blague à côté du bouton
+                      textOutput("joke_text", container = span, inline = TRUE)
              ),
              tags$div(
-               style = "position: fixed; bottom: 20px; right: 20px; z-index: 1000;",  # Style pour la position
-               img(src = "logoIARA.jpeg", style = "max-width: 200px; height: auto;")  # Garde le ratio d'aspect
+               style = "position: fixed; bottom: 20px; right: 20px; z-index: 1000;",  
+               img(src = "logoIARA.jpeg", style = "max-width: 200px; height: auto;")
              )
     )
   )
