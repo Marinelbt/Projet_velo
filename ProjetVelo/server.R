@@ -55,7 +55,7 @@ function(input, output, session) {
         Vacances = recode(Vacances,
                           `No Holiday` = "Non",
                           `Holiday` = "Oui"))
-    
+
     df$Heure <- as.factor(df$Heure)
     df$Jour <- as.factor(df$Jour)
     df$Mois <- as.factor(df$Mois)
@@ -72,6 +72,7 @@ function(input, output, session) {
   quant_vars <- c("Température", "Humidité", "Vitesse.du.vent", "Visibilité", 
                   "Température.du.point.de.rosée", "Rayonnement.solaire", 
                   "Précipitations", "Chutes.de.neige")
+
   qual_vars <- c("Heure", "Jour", "Mois", "Saisons", "Vacances", "Jour.de.fonctionnement", "Jour.de.la.semaine")
   
   labels <- c("Température" = "Température (°C)",
@@ -164,7 +165,7 @@ function(input, output, session) {
   # ANOVA
   output$anova_result <- renderUI({
     dta <- filtered_data()
-    
+
     tryCatch({
       aov_model <- aov(Rented.Bike.Count ~ dta[[input$varSelect]], data = dta)
       anova_summary <- summary(aov_model)
@@ -192,8 +193,7 @@ function(input, output, session) {
                  "Le coefficient de corrélation entre",labels[input$varSelect],"et le nombre de vélos loués est :", '<strong>',sprintf("%.2f", correlation_value), '</strong>',
                  '</div>'))}
   })
-  
-  
+
   
   # Logique pour afficher la blague lorsque le bouton est cliqué
   output$joke_text <- renderText({

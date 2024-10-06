@@ -217,48 +217,49 @@ fluidPage(
              )
     ),
     
-    tabPanel("Rencontrez notre équipe",
-             
-             fluidRow(
-               column(4,  
-                      div(
-                        class = "card",
-                        style = "padding: 20px; text-align: center;",
-                        h3("Timéo Baudat"),
-                        img(src = "tim.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
-                        p(""),
-                        a(href = "https://www.linkedin.com/in/timeo-baudat/", "Profil LinkedIn de Timéo", target = "_blank")
-                      )
-               ),
-               column(4,  
-                      div(
-                        class = "card",
-                        style = "padding: 20px; text-align: center;",
-                        h3("Élise Lonchampt"),
-                        img(src = "élise.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
-                        p(""),
-                        a(href = "https://www.linkedin.com/in/%C3%A9lise-lonchampt-232705235/", "Profil LinkedIn d'Élise", target = "_blank")
-                      )
-               ),
-               column(4,  
-                      div(
-                        class = "card",
-                        style = "padding: 20px; text-align: center;",
-                        h3("Marine Lebreton"),
-                        img(src = "marine.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
-                        p(" "),
-                        a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn de Marine", target = "_blank")
-                      )
-               )
-             ),
-             tags$div(class = "button-container",
-                      actionButton("joke_button", "Raconter une blague sur le vélo", class = "small-button"),
-                      textOutput("joke_text", container = span, inline = TRUE)
-             ),
-             tags$div(
-               style = "position: fixed; bottom: 20px; right: 20px; z-index: 1000;",  
-               img(src = "logoIARA.jpeg", style = "max-width: 200px; height: auto;")
-             )
-    )
+
+tabPanel("Rencontrez notre équipe",
+         
+         fluidRow(
+           column(4,  
+                  div(
+                    class = "card",
+                    style = "padding: 20px; text-align: center;",
+                    h3("Timéo Baudat"),
+                    img(src = "tim.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                    p(""),
+                    a(href = "https://www.linkedin.com/in/timeo-baudat/", "Profil LinkedIn de Timéo", target = "_blank")
+                  )
+           ),
+           column(4,  
+                  div(
+                    class = "card",
+                    style = "padding: 20px; text-align: center;",
+                    h3("Élise Lonchampt"),
+                    img(src = "élise.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                    p(""),
+                    a(href = "https://www.linkedin.com/in/%C3%A9lise-lonchampt-232705235/", "Profil LinkedIn d'Élise", target = "_blank")
+                  )
+           ),
+           column(4,  
+                  div(
+                    class = "card",
+                    style = "padding: 20px; text-align: center;",
+                    h3("Marine Lebreton"),
+                    img(src = "marine.jpeg", height = "150px", width = "150px", style = "border-radius: 50%;"),
+                    p(" "),
+                    a(href = "https://www.linkedin.com/in/marine-lebreton-21421215a/", "Profil LinkedIn de Marine", target = "_blank")
+                  )
+           )
+         ),
+         tags$div(class = "button-container",
+                  actionButton("joke_button", "Raconter une blague sur le vélo", class = "small-button"),
+                  textOutput("joke_text", container = span, inline = TRUE)
+         ),
+         tags$div(
+           style = "position: fixed; bottom: 20px; right: 20px; z-index: 1000;",  
+           img(src = "logoIARA.jpeg", style = "max-width: 200px; height: auto;")
+         )
+)
   )
 )
