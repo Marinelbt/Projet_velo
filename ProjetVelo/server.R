@@ -193,6 +193,7 @@ function(input, output, session) {
     )
   })
   
+  
   # 2) ONGLET PREDICTION 
   
   # Lecture du fichier importé
@@ -201,22 +202,45 @@ function(input, output, session) {
     newdata <- read.csv(input$file1$datapath, header = TRUE, sep = ",", stringsAsFactors = FALSE)
     
     # Vérification des colonnes attendues
-    expected_columns <- c("Heure", "Température", "Humidité", "Vitesse.du.vent", 
+    expected_columns <- c("Date", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
                           "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
                           "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
                           "Jour.de.fonctionnement", "Jour.de.la.semaine", "Mois")
     
-    if(!all(expected_columns %in% names(newdata))) {
+    if (!all(expected_columns %in% names(newdata))) {
       stop("Le fichier CSV ne contient pas les colonnes nécessaires.")
     }
     
     # Convertir les colonnes en facteurs
+    newdata$Date <- as.Date(newdata$Date, format = "%Y-%m-%d")
     newdata$Heure <- as.factor(newdata$Heure)  # Reste en tant que facteur
     newdata$Jour.de.la.semaine <- as.factor(newdata$Jour.de.la.semaine)
     newdata$Mois <- as.factor(newdata$Mois)
     
     return(newdata)
   })
+  
+  #Sélecteur de date pour les prédictions par heure
+  output$date_selector <- renderUI({
+    req(new_data())
+    if (input$graph_type == "hourly") {
+      selectInput("selected_date", "Sélectionnez une date:",
+                  choices = unique(new_data()$Date))  # Remplir avec les dates uniques
+    }
+  })
+  
+  # Créer le sélecteur de plage de dates pour les prédictions par jour
+  output$date_range_selector <- renderUI({
+    req(new_data())
+    if (input$graph_type == "daily") {
+      dateRangeInput("date_range", "Sélectionnez une plage de dates:",
+                     start = min(new_data()$Date), 
+                     end = max(new_data()$Date),
+                     min = min(new_data()$Date), 
+                     max = max(new_data()$Date))
+    }
+  })
+  
   
   df_mod <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
   df_mod$Date <- dmy(df_mod$Date)
@@ -240,35 +264,97 @@ function(input, output, session) {
     # Modèle que vous avez déjà créé (utilisez votre modèle ici)
     modglm <- glm(Rented.Bike.Count ~ ., family = 'poisson', data = df_mod)  # Remplacez df_mod par votre jeu de données
     
+    # Exclure la colonne "Date" avant de faire la prédiction
+    new_data_predict <- new_data()[, !(names(new_data()) %in% "Date")]
+    
     # Prédiction sur les nouvelles données
-    predictions <- predict(modglm, newdata = new_data(), type = "response")
+    predictions <- predict(modglm, newdata = new_data_predict, type = "response")
     
     # Ajouter les prédictions au jeu de données importé
     df_predictions <- new_data()
     df_predictions$Predicted <- predictions
     
-    # Créer la variable DateHour à partir de Heure (en supposant que vous avez un format temporel fixe)
-    # Par exemple, en utilisant une base fixe pour la date (ex: le 1er janvier 2024)
-    base_date <- "2024-01-01"  # Assurez-vous que cette date convient à votre contexte
-    df_predictions$DateHour <- as.POSIXct(paste(base_date, sprintf("%02d:00:00", as.numeric(as.character(df_predictions$Heure)))), tz = "UTC")
-    
-    # Vérifiez les longueurs
-    if (length(df_predictions$Predicted) != length(df_predictions$DateHour)) {
-      stop("Les longueurs des prédictions et des DateHour ne correspondent pas.")
+    if (input$graph_type == "hourly") {
+      
+      # Filtrer les données selon la date sélectionnée par l'utilisateur
+      df_filtered <- df_predictions[df_predictions$Date == input$selected_date,]
+      
+      # Vérifier si df_filtered n'est pas vide
+      if (nrow(df_filtered) == 0) {
+        stop("Aucune donnée trouvée pour la date sélectionnée.")
+      }
+      
+      # Récupérer le jour de la semaine pour la date sélectionnée
+      day_of_week <- unique(df_filtered$Jour.de.la.semaine)  # Utiliser unique pour éviter les doublons
+      
+      # Vérifier que le jour de la semaine existe
+      if (length(day_of_week) == 0) {
+        stop("Aucune valeur pour le jour de la semaine.")
+      }
+      
+      # Mettre la langue en français
+      Sys.setlocale("LC_TIME", "fr_FR.UTF-8")
+      
+      # Formatage de la date sélectionnée pour l'affichage dans le titre
+      formatted_date <- format(as.Date(input$selected_date), "%d %B %Y")
+      
+      # Dictionnaire pour les jours de la semaine
+      jours_semaine <- c("1" = "lundi", "2" = "mardi", "3" = "mercredi", 
+                         "4" = "jeudi", "5" = "vendredi", "6" = "samedi", 
+                         "7" = "dimanche")
+      
+      # Obtenir le nom du jour de la semaine
+      day_name <- jours_semaine[as.character(day_of_week)]
+      
+      # Vérification supplémentaire pour s'assurer que le nom du jour est correctement récupéré
+      if (is.na(day_name) || length(day_name) == 0) {
+        stop("Erreur dans la récupération du jour de la semaine.")
+      }
+      
+      output$plotly_predictions <- renderPlotly({
+        plot_ly(data = df_filtered, 
+                x = ~Heure, 
+                y = ~Predicted, 
+                type = 'scatter', 
+                mode = 'lines+markers', 
+                name = 'Prédiction',
+                hoverinfo = 'text',  # Spécifie que l'info de survol doit être définie manuellement
+                text = ~paste("Heure:", sprintf("%02d:00", as.numeric(as.character(Heure))),
+                              "<br>Prédiction:", round(Predicted, 2), "vélos")
+        ) %>%
+          layout(title = paste("Prédictions du nombre de vélos loués pour le", day_name, formatted_date),
+                 xaxis = list(title = "Heure de la journée"),
+                 yaxis = list(title = "Nombre de vélos loués"))
+      })
+    } else if (input$graph_type == "daily") {
+      # Filtrer les données selon la plage de dates sélectionnée par l'utilisateur pour les prédictions par jour
+      start_date <- input$date_range[1]
+      end_date <- input$date_range[2]
+      df_filtered <- df_predictions[df_predictions$Date >= start_date & df_predictions$Date <= end_date,]
+      
+      # Agréger les prédictions par jour
+      df_daily <- aggregate(Predicted ~ Date, data = df_filtered, FUN = sum)
+      
+      output$plotly_predictions <- renderPlotly({
+        plot_ly(data = df_daily, 
+                x = ~Date, 
+                y = ~Predicted, 
+                type = 'scatter', 
+                mode = 'lines+markers', 
+                name = 'Prédiction',
+                hoverinfo = 'text', 
+                text = ~paste("Date:", format(Date, "%d %B %Y"),
+                              "<br>Prédiction:", round(Predicted, 2), "vélos")
+        ) %>%
+          layout(title = paste("Prédictions du nombre de vélos loués du", format(start_date, "%d %B %Y"), "au", format(end_date, "%d %B %Y")),
+                 xaxis = list(title = "Date"),
+                 yaxis = list(title = "Nombre de vélos loués"))
+      })
+      
+      
     }
     
-    # Convertir les données en xts pour dygraphs
-    df_xts <- xts(df_predictions$Predicted, order.by = df_predictions$DateHour)
-    
-    # Afficher les prédictions dans un graphique interactif
-    output$dygraph_predictions <- renderDygraph({
-      dygraph(df_xts, main = "Prédiction du nombre de vélos loués par heure") %>%
-        dyAxis("y", label = "Nombre de vélos loués") %>%
-        dyAxis("x", label = "Heure de la journée")
-    })
   })
   
-  
-
   
 }
