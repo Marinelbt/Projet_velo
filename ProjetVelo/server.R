@@ -320,11 +320,11 @@ function(input, output, session) {
         Rayonnement.solaire = rep(NA, n),
         Précipitations = rep(NA, n),
         Chutes.de.neige = rep(NA, n),
-        Saisons = rep(factor(c("Spring", "Summer", "Autumn", "Winter")), length.out = n),  # Répéter pour chaque ligne
+        Saisons = rep(factor(c("Printemps", "Été", "Automne", "Hiver")), length.out = n),  # Répéter pour chaque ligne
         Vacances = rep(factor(c("Oui", "Non")), length.out = n),  # Répéter pour chaque ligne
         Jour.de.fonctionnement = rep(factor(c("Oui", "Non")), length.out = n),  # Répéter pour chaque ligne
         Jour.de.la.semaine = rep(factor(1:7, labels = c("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")), length.out = n),
-        Mois = rep(factor(1:12, labels = month.name), length.out = n)  # Répéter pour chaque ligne
+        Mois = rep(factor(1:12), length.out = n)  # Répéter pour chaque ligne
       )
       
       # Écrire le fichier CSV modèle
