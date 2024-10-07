@@ -85,7 +85,7 @@ write.csv(df_export, file = "test_prediction.csv", row.names = FALSE)
 
 
 ```{r}
-newdata <- read.csv("test_prediction.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE, row.names = NULL)
+newdata <- read.csv("~/Desktop/ACO M2 /Analyse de données massives sous R /Projet_shiny/Projet_velo_R/modele_bike_prediction_14_20_octobre_2024.csv", header = TRUE, sep = ";", stringsAsFactors = FALSE)
 ```
 
 

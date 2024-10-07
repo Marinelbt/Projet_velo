@@ -171,7 +171,7 @@ fluidPage(
                tabPanel("Jeu de données",
                         titlePanel("Structure du jeu de données"),
                         fluidRow(
-                          column(12,
+                          column(8,  # Colonne pour les informations
                                  h3("Informations sur les données"),
                                  h4("Nombre de lignes :"),
                                  textOutput("nb_lignes"),
@@ -182,13 +182,19 @@ fluidPage(
                                  h4("Variables Explicatives Qualitatives :"),
                                  uiOutput("var_qual"),       # Affichage des variables qualitatives
                                  p(""),
-                                 p(""),
-                                 h3("Aperçu du jeu de données")
+                                 p("")
+                          ),
+                          column(4,  # Colonne pour l'image
+                                 br(), br(),  # Ajoute deux sauts de ligne pour descendre l'image
+                                 img(src = "seoul.webp", 
+                                     alt = "Description de l'image", 
+                                     style = "width: 100%; height: auto;")  
                           )
                         ), 
                         # Section Tableau de données
                         fluidRow(
                           column(12,
+                                 h3("Aperçu du jeu de données"),
                                  DTOutput("data_table")
                           )
                         )

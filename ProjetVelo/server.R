@@ -335,7 +335,7 @@ function(input, output, session) {
   # Lecture du fichier importé
   new_data <- reactive({
     req(input$file1)
-    newdata <- read.csv(input$file1$datapath, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+    newdata <- read.csv(input$file1$datapath, header = TRUE, sep = ";", stringsAsFactors = FALSE)
     
     # Vérification des colonnes attendues
     expected_columns <- c("Date", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
