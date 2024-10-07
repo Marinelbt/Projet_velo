@@ -168,8 +168,9 @@ fluidPage(
         column(4,  # 4 sur 12 colonnes pour l'image
                img(src = "photo.jpg", style = "max-width: 100%; height: auto; margin-top: 50px;")
         )
+        
       )
-),
+    ),
     
     navbarMenu(title = "Description des données",
                tabPanel("Jeu de données",
@@ -223,23 +224,27 @@ fluidPage(
                         ))
     ),
     
-    tabPanel(title = "Prediction",
-             titlePanel("Prédiction du nombre de vélos loués"),
-             sidebarLayout(
-               sidebarPanel(
-                 fileInput("file1", "Choisir un fichier CSV",
-                           accept = c("text/csv",
-                                      "text/comma-separated-values,text/plain",
-                                      ".csv")),
-                 tags$hr(),
-                 actionButton("predict", "Faire la prédiction")
-               ),
-               
-               mainPanel(
-                 h3("Graphique des prédictions du nombre de vélos loués par heure"),
-                 dygraphOutput("dygraph_predictions")
-               )
-             )
+    tabPanel(
+      title = "Prediction",
+      titlePanel("Prédiction du nombre de vélos loués"),
+      sidebarLayout(
+        sidebarPanel(
+          fileInput("file1", "Choisir un fichier CSV",
+                    accept = c("text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")),
+          tags$hr(),
+          radioButtons("graph_type", "Type de graphique:",
+                       choices = list("Prédictions par heure" = "hourly",
+                                      "Prédictions par jour" = "daily")),
+          uiOutput("date_selector"),  # Sélecteur de date généré dynamiquement
+          uiOutput("date_range_selector"),  # Sélecteur de plage de dates pour les prédictions par jour
+          actionButton("predict", "Faire la prédiction")
+        ),
+        mainPanel(
+          plotlyOutput("plotly_predictions")
+        )
+      )
     ),
     
     tabPanel("Rencontrez notre équipe",
