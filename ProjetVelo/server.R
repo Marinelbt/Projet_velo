@@ -38,7 +38,7 @@ function(input, output, session) {
     df$Jour <- day(df$Date)
     df$Mois <- month(df$Date)
     df$Année <- year(df$Date)
-    df$Jour.de.la.semaine <- wday(df$Date, label = TRUE, abbr = FALSE, week_start = 1, locale = "fr_FR")
+    df$Jour.de.la.semaine <- wday(df$Date, label = TRUE, abbr = FALSE, week_start = 1)
     df$Saisons <- as.character(df$Saisons)
     df$Jour.de.fonctionnement <- as.character(df$Jour.de.fonctionnement)
     df$Vacances <- as.character(df$Vacances)
@@ -106,9 +106,9 @@ function(input, output, session) {
     # Filtrage supplémentaire si choix de la variable "Heure"
     if (input$varSelect == "Heure"){
       if (input$typeJour == "Week-end"){
-        df <- df %>% filter(Jour.de.la.semaine %in% c("Samedi", "Dimanche"))}
+        df <- df %>% filter(Jour.de.la.semaine %in% c("samedi", "dimanche"))}
       else if (input$typeJour == "Semaine"){
-        df <- df %>% filter(Jour.de.la.semaine %in% c("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"))}
+        df <- df %>% filter(Jour.de.la.semaine %in% c("lundi", "mardi", "mercredi", "jeudi", "vendredi"))}
     }
     return(df)
   })
