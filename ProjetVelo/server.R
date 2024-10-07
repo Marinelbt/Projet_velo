@@ -300,6 +300,38 @@ function(input, output, session) {
   
   # 2) ONGLET PREDICTION 
   
+  output$download_model <- downloadHandler(
+    filename = function() {
+      "modele_bike_prediction.csv"
+    },
+    content = function(file) {
+      # Nombre de lignes, ici basé sur 24 heures
+      n <- 24
+      
+      # Créer un modèle de fichier CSV avec les colonnes attendues
+      model_data <- data.frame(
+        Date = rep(Sys.Date(), n),  # Répéter la date pour correspondre aux heures
+        Heure = 0:23,  # Exemple pour les heures de la journée
+        Température = rep(NA, n),
+        Humidité = rep(NA, n),
+        Vitesse.du.vent = rep(NA, n),
+        Visibilité = rep(NA, n),
+        Température.du.point.de.rosée = rep(NA, n),
+        Rayonnement.solaire = rep(NA, n),
+        Précipitations = rep(NA, n),
+        Chutes.de.neige = rep(NA, n),
+        Saisons = rep(factor(c("Spring", "Summer", "Autumn", "Winter")), length.out = n),  # Répéter pour chaque ligne
+        Vacances = rep(factor(c("Oui", "Non")), length.out = n),  # Répéter pour chaque ligne
+        Jour.de.fonctionnement = rep(factor(c("Oui", "Non")), length.out = n),  # Répéter pour chaque ligne
+        Jour.de.la.semaine = rep(factor(1:7, labels = c("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")), length.out = n),
+        Mois = rep(factor(1:12, labels = month.name), length.out = n)  # Répéter pour chaque ligne
+      )
+      
+      # Écrire le fichier CSV modèle
+      write.csv(model_data, file, row.names = FALSE)
+    }
+  )
+  
   # Lecture du fichier importé
   new_data <- reactive({
     req(input$file1)
@@ -347,19 +379,45 @@ function(input, output, session) {
   
   
   df_mod <- read.table('SeoulBikeData.csv', sep = ",", dec=".", header=TRUE, stringsAsFactors = TRUE, fileEncoding = "ISO-8859-1")
+  colnames(df_mod) <- c("Date", "Rented.Bike.Count", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
+                        "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
+                        "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
+                        "Jour.de.fonctionnement")
   df_mod$Date <- dmy(df_mod$Date)
-  df_mod$Hour <- as.factor(df_mod$Hour)  # Gardez comme facteur
-  df_mod$Jour.de.la.semaine <- as.factor(format(df_mod$Date, "%u"))
-  df_mod$Mois <- as.factor(month(df_mod$Date))
+  df_mod$Mois <- month(df_mod$Date)
+  df_mod$Jour.de.la.semaine <- wday(df_mod$Date, label = TRUE, abbr = FALSE, week_start = 1, locale = "fr_FR")
+  df_mod$Saisons <- as.character(df_mod$Saisons)
+  df_mod$Jour.de.fonctionnement <- as.character(df_mod$Jour.de.fonctionnement)
+  df_mod$Vacances <- as.character(df_mod$Vacances)
+  df_mod <- df_mod %>%
+    mutate(
+      Saisons = case_when(
+        Saisons == "Spring" ~ "Printemps",
+        Saisons == "Summer" ~ "Été",
+        Saisons == "Autumn" ~ "Automne",
+        Saisons == "Winter" ~ "Hiver",
+        TRUE ~ Saisons  # Cette ligne est importante pour conserver les autres valeurs non modifiées
+      ),
+      Jour.de.fonctionnement = case_when(
+        Jour.de.fonctionnement == "Yes" ~ "Oui",
+        Jour.de.fonctionnement == "No" ~ "Non",
+        TRUE ~ Jour.de.fonctionnement
+      ),
+      Vacances = case_when(
+        Vacances == "No Holiday" ~ "Non",
+        Vacances == "Holiday" ~ "Oui",
+        TRUE ~ Vacances
+      )
+    )
+  df_mod$Heure <- as.factor(df_mod$Heure)
+  df_mod$Mois <- as.factor(df_mod$Mois)
+  df_mod$Saisons <- as.factor(df_mod$Saisons)
+  df_mod$Vacances <- as.factor(df_mod$Vacances)
+  df_mod$Jour.de.fonctionnement <- as.factor(df_mod$Jour.de.fonctionnement)
+  df_mod$Jour.de.la.semaine <- as.factor((df_mod$Jour.de.la.semaine))
   
   df_mod <- df_mod[,2:16]
   
-  colnames(df_mod) <- c("Rented.Bike.Count", "Heure", "Température",
-                        "Humidité", "Vitesse.du.vent", "Visibilité", 
-                        "Température.du.point.de.rosée",
-                        "Rayonnement.solaire", "Précipitations", "Chutes.de.neige", "Saisons",
-                        "Vacances", "Jour.de.fonctionnement", "Jour.de.la.semaine",
-                        "Mois")
   
   # Faire la prédiction lorsque l'utilisateur appuie sur le bouton
   observeEvent(input$predict, {
@@ -389,26 +447,13 @@ function(input, output, session) {
       }
       
       # Récupérer le jour de la semaine pour la date sélectionnée
-      day_of_week <- unique(df_filtered$Jour.de.la.semaine)  # Utiliser unique pour éviter les doublons
-      
-      # Vérifier que le jour de la semaine existe
-      if (length(day_of_week) == 0) {
-        stop("Aucune valeur pour le jour de la semaine.")
-      }
+      day_name <- unique(df_filtered$Jour.de.la.semaine)  # Utiliser unique pour éviter les doublons
       
       # Mettre la langue en français
       Sys.setlocale("LC_TIME", "fr_FR.UTF-8")
       
       # Formatage de la date sélectionnée pour l'affichage dans le titre
       formatted_date <- format(as.Date(input$selected_date), "%d %B %Y")
-      
-      # Dictionnaire pour les jours de la semaine
-      jours_semaine <- c("1" = "lundi", "2" = "mardi", "3" = "mercredi", 
-                         "4" = "jeudi", "5" = "vendredi", "6" = "samedi", 
-                         "7" = "dimanche")
-      
-      # Obtenir le nom du jour de la semaine
-      day_name <- jours_semaine[as.character(day_of_week)]
       
       # Vérification supplémentaire pour s'assurer que le nom du jour est correctement récupéré
       if (is.na(day_name) || length(day_name) == 0) {
@@ -424,7 +469,7 @@ function(input, output, session) {
                 name = 'Prédiction',
                 hoverinfo = 'text',  # Spécifie que l'info de survol doit être définie manuellement
                 text = ~paste("Heure:", sprintf("%02d:00", as.numeric(as.character(Heure))),
-                              "<br>Prédiction:", round(Predicted, 2), "vélos")
+                              "<br>Prédiction:", round(Predicted, 0), "vélos")
         ) %>%
           layout(title = paste("Prédictions du nombre de vélos loués pour le", day_name, formatted_date),
                  xaxis = list(title = "Heure de la journée"),
@@ -448,14 +493,12 @@ function(input, output, session) {
                 name = 'Prédiction',
                 hoverinfo = 'text', 
                 text = ~paste("Date:", format(Date, "%d %B %Y"),
-                              "<br>Prédiction:", round(Predicted, 2), "vélos")
+                              "<br>Prédiction:", round(Predicted, 0), "vélos")
         ) %>%
           layout(title = paste("Prédictions du nombre de vélos loués du", format(start_date, "%d %B %Y"), "au", format(end_date, "%d %B %Y")),
                  xaxis = list(title = "Date"),
                  yaxis = list(title = "Nombre de vélos loués"))
       })
-      
-      
     }
     
   })

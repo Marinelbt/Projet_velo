@@ -225,19 +225,34 @@ fluidPage(
       titlePanel("Prédiction du nombre de vélos loués"),
       sidebarLayout(
         sidebarPanel(
+          # Bouton pour télécharger le fichier modèle CSV
+          downloadButton("download_model", "Télécharger le fichier modèle CSV"),
+          
+          # Texte explicatif entre l'exportation et l'importation
+          tags$p("Le fichier CSV que vous importez doit contenir les mêmes variables que le fichier modèle. Si vous souhaitez plus d'information sur les variables du jeu de données, rendez vous dans l'onglet 'Jeu de données' de la partie 'Description des données'."),
+          tags$p(""),
+          # Bouton pour importer un fichier CSV
           fileInput("file1", "Choisir un fichier CSV",
                     accept = c("text/csv",
                                "text/comma-separated-values,text/plain",
                                ".csv")),
+          
           tags$hr(),
+          
+          # Radio bouton pour choisir le type de prédiction
           radioButtons("graph_type", "Type de graphique:",
                        choices = list("Prédictions par heure" = "hourly",
                                       "Prédictions par jour" = "daily")),
-          uiOutput("date_selector"),  # Sélecteur de date généré dynamiquement
-          uiOutput("date_range_selector"),  # Sélecteur de plage de dates pour les prédictions par jour
+          
+          # Sélecteur de date et plage de dates dynamiques
+          uiOutput("date_selector"),  # Sélecteur de date
+          uiOutput("date_range_selector"),  # Sélecteur de plage de dates
+          
+          # Bouton pour lancer la prédiction
           actionButton("predict", "Faire la prédiction")
         ),
         mainPanel(
+          # Output du graphique
           plotlyOutput("plotly_predictions")
         )
       )
