@@ -14,71 +14,65 @@ fluidPage(
     tags$style(HTML("
       /* Couleur du bandeau */
       .navbar {
-        background-color: #ec5030 !important;  /* Bordeaux clair */
+        background-color: #2C3E50 !important;  /* Bleu sombre */
       }
       
       /* Couleur du texte des onglets et du titre */
       .navbar-default .navbar-nav > li > a, 
       .navbar-default .navbar-brand {
-        color: white !important;  /* Blanc */
+        color: white !important;  /* Texte en blanc par défaut */
       }
       
       /* Couleur de l'onglet au survol */
       .navbar-default .navbar-nav > li > a:hover {
-        background-color: #660000 !important;  /* Rouge foncé */
-        color: white !important;  /* Blanc */
+        background-color: #34495E !important;  /* Gris foncé au survol */
+        color: white !important;  /* Texte blanc au survol */
       }
       
       /* État de l'onglet actif (sélectionné) */
       .navbar-default .navbar-nav > .active > a {
-        background-color: #660000 !important;  /* Rouge foncé */
-        color: white !important;  /* Blanc */
+        background-color: #34495E !important;  /* Gris foncé tant que l'onglet est actif */
+        color: white !important;  /* Texte blanc */
       }
 
       /* Garder la couleur de l'onglet actif au survol */
       .navbar-default .navbar-nav > .active > a:hover {
-        background-color: #660000 !important;  /* Rouge foncé */
-        color: white !important;  /* Blanc */
+        background-color: #34495E !important;  /* Garder gris foncé au survol */
+        color: white !important;  /* Texte blanc */
       }
 
-      /* Sous-onglets (dropdown) au survol */
+      /* Couleur des sous-onglets (dropdown) */
       .navbar-default .navbar-nav .dropdown-menu > li > a:hover {
-        background-color: #660000 !important;  /* Rouge foncé */
-        color: white !important;  /* Blanc */
+        background-color: #34495E !important;  /* Gris foncé pour les sous-onglets */
+        color: white !important;  /* Texte blanc */
       }
-
-      /* Conserver la couleur rouge foncé pour le sous-onglet actif */
+      
+      /* Conserver la couleur grise pour le sous-onglet actif */
       .navbar-default .navbar-nav .dropdown-menu > .active > a {
-        background-color: #660000 !important;  /* Rouge foncé */
-        color: white !important;  /* Blanc */
+        background-color: #34495E !important;  /* Gris foncé pour le sous-onglet actif */
+        color: white !important;  /* Texte blanc */
       }
 
-      /* Pour maintenir l'onglet actif en rouge foncé, même lorsque des sous-onglets sont sélectionnés */
-      .navbar-default .navbar-nav .dropdown.open > a {
-        background-color: #660000 !important;  /* Rouge foncé */
-        color: white !important;  /* Blanc */
-      }
-      
-      /* Couleur des titres de section */
+      /* Titre des sections */
       h1, h2, h3, h4, h5, h6 {
-        color: #662a2a !important;  /* Rouge foncé */
+        color: #2C3E50 !important;  /* Bleu sombre */
       }
       
-      /* Couleur des liens hypertexte */
-    a {
-      color: #651515  !important;  /* Rouge foncé */
-    }
+      /* Couleur des liens */
+      a {
+        color: #1ABC9C !important;  /* Vert menthe pour les liens */
+      }
 
-    /* Couleur des liens au survol */
-    a:hover {
-      color: #ec5030 !important;  /* Bordeaux clair */
-    }
+      /* Couleur des liens au survol */
+      a:hover {
+        color: #16A085 !important;  /* Vert foncé au survol */
+      }
     
     
     
     /* Style du bouton principal */
       .stylish-button {
-        background-color: #660000; /* Rouge foncé */
+        background-color: #2C3E50; /* Bleu sombre */
         color: white; /* Texte en blanc */
         border: none; /* Pas de bordure */
         border-radius: 5px; /* Coins arrondis */
@@ -90,12 +84,12 @@ fluidPage(
 
       /* Changer le style au survol */
       .stylish-button:hover {
-        background-color: #ec5030; /* Bordeaux clair au survol */
+        background-color: #34495E; /* Gris foncé au survol */
       }
 
       /* Style du bouton pour la blague */
       .small-button {
-        background-color: #660000; /* Rouge foncé */
+        background-color: #2C3E50; /* Bleu sombre */
         color: white; /* Texte en blanc */
         border: none; /* Pas de bordure */
         border-radius: 5px; /* Coins arrondis */
@@ -107,7 +101,7 @@ fluidPage(
 
       /* Changer le style au survol */
       .small-button:hover {
-        background-color: #ec5030; /* Bordeaux clair au survol */
+        background-color: #ffc500; /* jaune au survol */
       }
 
       /* Positionner le conteneur de boutons en bas à gauche */
@@ -129,7 +123,8 @@ fluidPage(
   ),
   navbarPage(
     title = div(
-      img(src = "logo.png", height = "40px", style = "margin-top: -10px;")
+      style = "display: flex; justify-content: center; align-items: center; height: 60px; width: 100%;",
+      img(src = "seoul_bike.png", height = "60px", style = "margin-top: -40px;")
     ),
     
     # Premier onglet - Présentation
@@ -215,6 +210,7 @@ fluidPage(
                                            min = "2017-12-01", 
                                            max = "2018-11-30",
                                            format = "yyyy-mm-dd"), # Choix des dates
+                            uiOutput("date_message"), # Affichage du message
                             div(uiOutput("anova_result"), style = "margin-bottom: 20px;"), # Affichage du résultat de l'ANOVA
                             div(uiOutput("correlation"))), # Affichage du coeff de corrélation si quanti
                           
