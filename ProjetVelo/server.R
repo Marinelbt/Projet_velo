@@ -275,7 +275,7 @@ function(input, output, session) {
   output$var_qual <- renderUI({
     # Liste des variables qualitatives avec descriptions
     qual_vars <- list(
-      "Date" = "Date (jour, mois et année",
+      "Date" = "Date (jour, mois et année)",
       "Hour" = "Heure de la journée",
       "Seasons" = "Saison : hiver, printemps, été ou automne",
       "Holiday" = "Vacances : oui ou non",
