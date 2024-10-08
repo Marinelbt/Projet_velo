@@ -292,7 +292,7 @@ function(input, output, session) {
   output$data_table <- DT::renderDataTable({
     df <- data_reactive()
     DT::datatable(
-      df[,-(15:17)],
+      df[,-(15:21)],
       options = list(scrollX = TRUE)  # Activer le défilement horizontal
     )
   })
