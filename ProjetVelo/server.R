@@ -276,10 +276,10 @@ function(input, output, session) {
     # Liste des variables qualitatives avec descriptions
     qual_vars <- list(
       "Date" = "Date (jour, mois et année)",
-      "Hour" = "Heure de la journée",
-      "Seasons" = "Saison : hiver, printemps, été ou automne",
-      "Holiday" = "Vacances : oui ou non",
-      "Functioning.Day" = "Jour de fonctionnement : oui ou non"
+      "Heure" = "Heure de la journée",
+      "Saisons" = "Saison : hiver, printemps, été ou automne",
+      "Vacances" = "Vacances : oui ou non",
+      "Jour.de.fonctionnement" = "Jour de fonctionnement : oui ou non"
     )
     
     # Formatage des variables qualitatives

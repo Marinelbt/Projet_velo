@@ -148,10 +148,8 @@ fluidPage(
                  franc et compte aujourd'hui plus de 800 stations à travers la 
                  ville. Une certaine logistique est donc indispensable pour 
                  assurer le bon fonctionnement du service et répondre à la 
-                 demande croissante des utilisateurs. Prévoir le nombre de vélos 
-                 nécessaires et identifier les facteurs clés qui influencent la 
-                 demande de location peut grandement aider à fournir à la ville 
-                 une offre stable de vélos."),
+                 demande croissante des utilisateurs." , 
+                 strong("Prévoir le nombre de vélos nécessaires et identifier les facteurs clés qui influencent la demande de location peut grandement aider à fournir à la ville une offre stable de vélos.")),
                p(""),
                p("Le jeu de données utilisé pour répondre à cette problématique 
                  est composé de 14 variables : 1 variable réponse (le nombre de 
@@ -235,7 +233,7 @@ fluidPage(
           downloadButton("download_model", "Télécharger le fichier modèle CSV"),
           
           # Texte explicatif entre l'exportation et l'importation
-          tags$p("Le fichier CSV que vous importez doit contenir les mêmes variables que le fichier modèle. Si vous souhaitez plus d'information sur les variables du jeu de données, rendez vous dans l'onglet 'Jeu de données' de la partie 'Description des données'."),
+          tags$p("Le fichier CSV que vous importez doit contenir les mêmes variables que le fichier modèle. Si vous souhaitez plus d'information sur les variables du jeu de données, rendez-vous dans l'onglet 'Jeu de données' de la partie 'Description des données'."),
           tags$p(""),
           # Bouton pour importer un fichier CSV
           fileInput("file1", "Choisir un fichier CSV",
