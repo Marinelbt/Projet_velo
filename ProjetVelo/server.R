@@ -99,7 +99,7 @@ function(input, output, session) {
       
       if (start_date > end_date) {
         return(HTML("<div style='color: red; font-weight: bold; margin-bottom: 10px;'>
-                      La date de début doit être inférieure à la date de fin.
+                      La date de début doit être antérieure à la date de fin.
                     </div>"))
       } 
     }
@@ -322,9 +322,7 @@ function(input, output, session) {
         Chutes.de.neige = rep(NA, n),
         Saisons = rep(factor(c("Printemps", "Été", "Automne", "Hiver")), length.out = n),  # Répéter pour chaque ligne
         Vacances = rep(factor(c("Oui", "Non")), length.out = n),  # Répéter pour chaque ligne
-        Jour.de.fonctionnement = rep(factor(c("Oui", "Non")), length.out = n),  # Répéter pour chaque ligne
-        Jour.de.la.semaine = rep(factor(1:7, labels = c("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")), length.out = n),
-        Mois = rep(factor(1:12), length.out = n)  # Répéter pour chaque ligne
+        Jour.de.fonctionnement = rep(factor(c("Oui", "Non")), length.out = n)  # Répéter pour chaque ligne
       )
       
       # Écrire le fichier CSV modèle
@@ -341,7 +339,7 @@ function(input, output, session) {
     expected_columns <- c("Date", "Heure", "Température", "Humidité", "Vitesse.du.vent", 
                           "Visibilité", "Température.du.point.de.rosée", "Rayonnement.solaire", 
                           "Précipitations", "Chutes.de.neige", "Saisons", "Vacances", 
-                          "Jour.de.fonctionnement", "Jour.de.la.semaine", "Mois")
+                          "Jour.de.fonctionnement")
     
     if (!all(expected_columns %in% names(newdata))) {
       stop("Le fichier CSV ne contient pas les colonnes nécessaires.")
@@ -350,6 +348,8 @@ function(input, output, session) {
     # Convertir les colonnes en facteurs
     newdata$Date <- as.Date(newdata$Date, format = "%Y-%m-%d")
     newdata$Heure <- as.factor(newdata$Heure)  # Reste en tant que facteur
+    newdata$Jour.de.la.semaine <- wday(newdata$Date, label = TRUE, abbr = FALSE, week_start = 1, locale = "fr_FR")
+    newdata$Mois <- month(newdata$Date)
     newdata$Jour.de.la.semaine <- as.factor(newdata$Jour.de.la.semaine)
     newdata$Mois <- as.factor(newdata$Mois)
     
