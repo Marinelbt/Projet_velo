@@ -8,17 +8,14 @@
 #
 
 library(shiny)
-#library(dygraphs)
 library(xts)
 library(lubridate)
 library(factoextra)
-#library(htmlwidgets)
 library(plotly)
 library(tidyverse)
 
 
 
-# Define server logic required to draw a histogram
 function(input, output, session) {
   
   
@@ -129,7 +126,7 @@ function(input, output, session) {
   })
   
   output$varSelectUI <- renderUI({
-    df <- data_reactive()  # Appel du jeu de données réactif
+    df <- data_reactive() 
     
     selectInput("varSelect", 
                 "Choisir la variable à analyser :",
@@ -231,6 +228,8 @@ function(input, output, session) {
     req(input$joke_button)  # Nécessite que le bouton soit cliqué
     sample(blague,1)
   })
+  
+  
   #MARINE
   
   #1) ONGLET STRUCTURE DU JEU DE DONNEES
@@ -320,9 +319,9 @@ function(input, output, session) {
         Rayonnement.solaire = rep(NA, n),
         Précipitations = rep(NA, n),
         Chutes.de.neige = rep(NA, n),
-        Saisons = rep(factor(c("Printemps", "Été", "Automne", "Hiver")), length.out = n),  # Répéter pour chaque ligne
-        Vacances = rep(factor(c("Oui", "Non")), length.out = n),  # Répéter pour chaque ligne
-        Jour.de.fonctionnement = rep(factor(c("Oui", "Non")), length.out = n)  # Répéter pour chaque ligne
+        Saisons = rep(factor(c("Printemps", "Été", "Automne", "Hiver")), length.out = n), 
+        Vacances = rep(factor(c("Oui", "Non")), length.out = n), 
+        Jour.de.fonctionnement = rep(factor(c("Oui", "Non")), length.out = n)  
       )
       
       # Écrire le fichier CSV modèle
@@ -347,7 +346,7 @@ function(input, output, session) {
     
     # Convertir les colonnes en facteurs
     newdata$Date <- as.Date(newdata$Date, format = "%Y-%m-%d")
-    newdata$Heure <- as.factor(newdata$Heure)  # Reste en tant que facteur
+    newdata$Heure <- as.factor(newdata$Heure)  
     newdata$Jour.de.la.semaine <- wday(newdata$Date, label = TRUE, abbr = FALSE, week_start = 1, locale = "fr_FR")
     newdata$Mois <- month(newdata$Date)
     newdata$Jour.de.la.semaine <- as.factor(newdata$Jour.de.la.semaine)
@@ -361,7 +360,7 @@ function(input, output, session) {
     req(new_data())
     if (input$graph_type == "hourly") {
       selectInput("selected_date", "Sélectionnez une date:",
-                  choices = unique(new_data()$Date))  # Remplir avec les dates uniques
+                  choices = unique(new_data()$Date))  
     }
   })
   
@@ -421,10 +420,10 @@ function(input, output, session) {
   
   # Faire la prédiction lorsque l'utilisateur appuie sur le bouton
   observeEvent(input$predict, {
-    req(new_data())  # S'assurer que les données sont chargées
+    req(new_data())  
     
-    # Modèle que vous avez déjà créé (utilisez votre modèle ici)
-    modglm <- glm(Rented.Bike.Count ~ ., family = 'poisson', data = df_mod)  # Remplacez df_mod par votre jeu de données
+    # Modèle 
+    modglm <- glm(Rented.Bike.Count ~ ., family = 'poisson', data = df_mod)  
     
     # Exclure la colonne "Date" avant de faire la prédiction
     new_data_predict <- new_data()[, !(names(new_data()) %in% "Date")]
@@ -447,7 +446,7 @@ function(input, output, session) {
       }
       
       # Récupérer le jour de la semaine pour la date sélectionnée
-      day_name <- unique(df_filtered$Jour.de.la.semaine)  # Utiliser unique pour éviter les doublons
+      day_name <- unique(df_filtered$Jour.de.la.semaine)  
       
       # Mettre la langue en français
       Sys.setlocale("LC_TIME", "fr_FR.UTF-8")
@@ -467,7 +466,7 @@ function(input, output, session) {
                 type = 'scatter', 
                 mode = 'lines+markers', 
                 name = 'Prédiction',
-                hoverinfo = 'text',  # Spécifie que l'info de survol doit être définie manuellement
+                hoverinfo = 'text', 
                 text = ~paste("Heure:", sprintf("%02d:00", as.numeric(as.character(Heure))),
                               "<br>Prédiction:", round(Predicted, 0), "vélos")
         ) %>%

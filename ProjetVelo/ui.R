@@ -6,9 +6,7 @@ library(plotly)
 library(tidyverse)
 
 
-# Define UI for application
 fluidPage(
-  #theme = shinytheme("cerulean"),
   # Ajout de styles personnalisés via CSS
   tags$head(
     tags$style(HTML("
